@@ -1,0 +1,36 @@
+{
+  "name": "ludoskul",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.30.3",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "db:migrate": "pnpm --filter @ludoskul/api db:migrate",
+    "db:seed": "pnpm --filter @ludoskul/api db:seed",
+    "openapi:gen": "pnpm --filter @ludoskul/api openapi:gen",
+    "openapi:check": "pnpm --filter @ludoskul/api openapi:check",
+    "storybook": "pnpm --filter @ludoskul/ui storybook",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^9.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "husky": "^9.1.7",
+    "prettier": "^3.3.3",
+    "turbo": "^2.5.4",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.71.0"
+  }
+}

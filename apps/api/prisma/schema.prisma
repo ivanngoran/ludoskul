@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// IDs cuid2 partout (08-§1, 17-§2) : Prisma 5 ne supporte pas le default cuid2 en schema,
+// génération cuid2 via @paralleldrive/cuid2 côté app. Migration Prisma 6 → default cuid version 2.
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ExerciseCategory {
+  CALCUL
+  NOMBRES
+  MESURES
+  GEOMETRIE
+  LOGIQUE
+}
+
+enum SessionMode {
+  TRAINING
+  ARCADE
+}
+
+enum AuthProvider {
+  google
+  apple
+  email
+  phone
+  guest
+  microsoft
+  passkey
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  passwordHash  String?
+  pseudo        String    @unique
+  avatarId      String    @default("fox")
+  country       String?
+  xp            Int       @default(0)
+  level         Int       @default(1)
+  theme         String    @default("default")
+  accessibility Json      @default("{}")
+  birthYear     Int?
+  isChild       Boolean   @default(false)
+  parentId      String?
+  rankingPublic Boolean   @default(true)
+  guest         Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  identities    Identity[]
+  devices       Device[]
+  sessions      Session[]
+  rankings      Ranking[]
+  progress      Progress[]
+  badges        UserBadge[]
+  refreshTokens AuthRefresh[]
+  children      User[]    @relation("ParentChildren")
+  parent        User?     @relation("ParentChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  familiesAsParent Family[] @relation("FamilyParent")
+}
+
+model Identity {
+  id              String       @id @default(cuid())
+  userId          String
+  provider        AuthProvider
+  providerSub     String
+  emailLower      String?      @unique
+  phoneHash       String?      @unique
+  phoneE164Encrypted String?
+  emailVerifiedAt DateTime?
+  phoneVerifiedAt DateTime?
+  createdAt       DateTime     @default(now())
+  lastUsedAt      DateTime     @default(now())
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerSub])
+  @@index([userId])
+}
+
+model OtpChallenge {
+  id               String    @id @default(cuid())
+  purpose          String
+  channel          String
+  targetHash       String
+  codeHash         String
+  expiresAt        DateTime
+  attempts         Int       @default(0)
+  resendAvailableAt DateTime
+  consumedAt       DateTime?
+  createdAt        DateTime  @default(now())
+}
+
+model Device {
+  id              String    @id @default(cuid())
+  userId          String
+  label           String    @default("appareil")
+  refreshTokenHash String?  @unique
+  createdAt       DateTime  @default(now())
+  lastSeenAt      DateTime  @default(now())
+  revokedAt       DateTime?
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Family {
+  id           String   @id @default(cuid())
+  parentUserId String
+  childUserId  String   @unique
+  consentAt    DateTime @default(now())
+  consentText  String   @default("v1")
+  createdAt    DateTime @default(now())
+  parent       User     @relation("FamilyParent", fields: [parentUserId], references: [id], onDelete: Cascade)
+
+  @@index([parentUserId])
+}
+
+model Exercise {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  name        String
+  description String            @default("")
+  category    ExerciseCategory
+  icon        String
+  color       String
+  config      Json              @default("{}")
+  help        Json              @default("{}")
+  isActive    Boolean           @default(false)
+  order       Int
+  sessions    Session[]
+  rankings    Ranking[]
+  progress    Progress[]
+}
+
+model Session {
+  id            String      @id @default(cuid())
+  userId        String
+  exerciseId    String
+  mode          SessionMode
+  seedBase      String
+  startLevel    Int
+  maxLevel      Int         @default(1)
+  blockIndex    Int         @default(0)
+  score         Int         @default(0)
+  trainingScore Int         @default(0)
+  timeSpent     Float       @default(0)
+  correct       Int         @default(0)
+  total         Int         @default(0)
+  accuracy      Float       @default(0)
+  completed     Boolean     @default(false)
+  stopped       Boolean     @default(false)
+  assisted      Boolean     @default(false)
+  offline       Boolean     @default(false)
+  keyboard      Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  finishedAt    DateTime?
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise      Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  answers       Answer[]
+
+  @@index([userId, exerciseId, mode, createdAt])
+}
+
+model Answer {
+  id            String   @id @default(cuid())
+  sessionId     String
+  mode          SessionMode
+  level         Int
+  blockIndex    Int      @default(0)
+  questionIndex Int
+  questionHash  String
+  chosen        String
+  correct       Boolean
+  timeMs        Int
+  inputMode     String
+  createdAt     DateTime @default(now())
+  session       Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Ranking {
+  id         String   @id @default(cuid())
+  userId     String
+  exerciseId String
+  weekStart  DateTime
+  score      Int
+  timeSpent  Float    @default(0)
+  accuracy   Float    @default(0)
+  maxLevel   Int      @default(1)
+  rank       Int?
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, exerciseId, weekStart])
+  @@index([exerciseId, weekStart, score])
+}
+
+model Progress {
+  id                     String   @id @default(cuid())
+  userId                 String
+  exerciseId             String
+  bestScoreArcade        Int      @default(0)
+  bestAccuracyArcade     Float    @default(0)
+  maxLevelArcade         Int      @default(0)
+  totalSessionsArcade    Int      @default(0)
+  trainingQuestions      Int      @default(0)
+  trainingAccuracy       Float    @default(0)
+  trainingLevelsPracticed Int[]   @default([])
+  lastPlayed             DateTime?
+  lastTrainingAt         DateTime?
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercise               Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, exerciseId])
+}
+
+model Badge {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  description String      @default("")
+  xpBonus     Int         @default(0)
+  icon        String      @default("medal")
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeCode String
+  earnedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeCode], references: [code], onDelete: Cascade)
+
+  @@unique([userId, badgeCode])
+}
+
+model AuthRefresh {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DeletedPseudo {
+  id        String   @id @default(cuid())
+  pseudo    String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
