@@ -1,4 +1,68 @@
-import { EXERCISES } from '@ludoskul/shared';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { PrismaClient } from '@prisma/client';
 
-console.log(`Seed référentiel: ${EXERCISES.length} exercices (pilotes: ${EXERCISES.filter((e) => e.isPilot).length})`);
-// TODO Phase 1 (BE-1.3): upsert Prisma Exercise + Badge (39 codes 07-§5) — idempotent.
+const dir = dirname(fileURLToPath(import.meta.url));
+const exercises = JSON.parse(readFileSync(join(dir, 'seeds', 'exercises.json'), 'utf8')) as Array<{
+    code: string;
+    name: string;
+    category: 'CALCUL' | 'NOMBRES' | 'MESURES' | 'GEOMETRIE' | 'LOGIQUE';
+    icon: string;
+    color: string;
+    order: number;
+    isActive: boolean;
+    description: string;
+    config: unknown;
+    help: unknown;
+}>;
+const badges = JSON.parse(readFileSync(join(dir, 'seeds', 'badges.json'), 'utf8')) as Array<{
+    code: string;
+    name: string;
+    description: string;
+    xpBonus: number;
+    icon: string;
+}>;
+
+const prisma = new PrismaClient();
+
+for (const e of exercises) {
+    await prisma.exercise.upsert({
+        where: { code: e.code },
+        update: {
+            name: e.name,
+            description: e.description,
+            category: e.category,
+            icon: e.icon,
+            color: e.color,
+            config: e.config as object,
+            help: e.help as object,
+            isActive: e.isActive,
+            order: e.order,
+        },
+        create: {
+            code: e.code,
+            name: e.name,
+            description: e.description,
+            category: e.category,
+            icon: e.icon,
+            color: e.color,
+            config: e.config as object,
+            help: e.help as object,
+            isActive: e.isActive,
+            order: e.order,
+        },
+    });
+}
+
+for (const b of badges) {
+    await prisma.badge.upsert({
+        where: { code: b.code },
+        update: { name: b.name, description: b.description, xpBonus: b.xpBonus, icon: b.icon },
+        create: { code: b.code, name: b.name, description: b.description, xpBonus: b.xpBonus, icon: b.icon },
+    });
+}
+
+const pilots = exercises.filter((e) => e.isActive).length;
+console.log(`seed OK: ${exercises.length} exercices (${pilots} pilotes), ${badges.length} badges`);
+await prisma.$disconnect();

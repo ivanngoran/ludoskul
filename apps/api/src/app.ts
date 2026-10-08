@@ -1,19 +1,43 @@
-import Fastify, { type FastifyInstance } from 'fastify';
+import Fastify, { type FastifyError, type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import { randomUUID } from 'node:crypto';
 import { EXERCISES } from '@ludoskul/shared';
+import { config, cspDirectives, rateLimits } from './config.js';
 import { healthRoutes } from './routes/health.js';
 import { exerciseRoutes } from './routes/exercises.js';
 import { sessionRoutes } from './routes/sessions.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
-    const app = Fastify({ logger: { level: 'info' } });
-    await app.register(cors, { origin: (process.env.CORS_ORIGIN ?? '').split(',').filter(Boolean) || true });
-    await app.register(helmet, { contentSecurityPolicy: false });
-    await app.register(rateLimit, { max: 200, timeWindow: '1 minute' });
+    // Logs JSON sans PII (10-§2) : jamais email/téléphone/code/OTP/mot de passe.
+    const app = Fastify({
+        logger: {
+            level: 'info',
+            serializers: {
+                req(req) {
+                    return { id: req.id, method: req.method, url: req.url };
+                },
+            },
+        },
+        requestIdHeader: 'x-request-id',
+        genReqId: () => randomUUID(),
+    });
+    // CORS = origine front seule (10-§2). Refuse origine inconnue.
+    await app.register(cors, { origin: config.corsOrigins });
+    // Helmet CSP stricte opposable 10-§2 + HSTS + nosniff.
+    await app.register(helmet, {
+        contentSecurityPolicy: { directives: cspDirectives() },
+        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+        noSniff: true,
+    });
+    await app.register(rateLimit, { max: rateLimits.globalMax, timeWindow: rateLimits.globalWindow });
+    // Traçabilité sans PII : expose l'id requête en réponse (corrélé aux logs JSON).
+    app.addHook('onSend', async (req, reply) => {
+        reply.header('x-request-id', req.id);
+    });
     await app.register(swagger, {
         openapi: { info: { title: 'Ludoskul API', version: '0.1.0' }, paths: {} },
     });
@@ -29,9 +53,10 @@ export async function buildApp(): Promise<FastifyInstance> {
         maintenance: false,
     }));
     void EXERCISES;
-    app.setErrorHandler((err, _req, reply) => {
+    app.setErrorHandler((err: FastifyError, _req, reply) => {
         const status = err.statusCode ?? 500;
-        reply.status(status).send({ error: { code: err.code ?? 'INTERNAL', message: err.message } });
+        const code = err.code ?? 'INTERNAL';
+        reply.status(status).send({ error: { code, message: err.message } });
     });
     return app;
 }

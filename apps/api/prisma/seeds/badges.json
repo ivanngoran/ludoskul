@@ -1,0 +1,280 @@
+[
+  {
+    "code": "FIRST_STEP",
+    "name": "Premier pas",
+    "description": "Finir niveau 1 (tout exo)",
+    "xpBonus": 50,
+    "icon": "steps"
+  },
+  {
+    "code": "STREAK_5",
+    "name": "Série 5",
+    "description": "5 bonnes d'affilée",
+    "xpBonus": 50,
+    "icon": "flame"
+  },
+  {
+    "code": "STREAK_10",
+    "name": "Série 10",
+    "description": "10 bonnes d'affilée",
+    "xpBonus": 100,
+    "icon": "flame"
+  },
+  {
+    "code": "FLAWLESS_LEVEL",
+    "name": "Sans faute (niveau)",
+    "description": "3/3 niveau",
+    "xpBonus": 100,
+    "icon": "star"
+  },
+  {
+    "code": "SPEEDY",
+    "name": "Rapide",
+    "description": "3 ⚡ dans même niveau",
+    "xpBonus": 100,
+    "icon": "bolt"
+  },
+  {
+    "code": "SURVIVOR",
+    "name": "Survivant",
+    "description": "Finir niveau avec 1 vie",
+    "xpBonus": 80,
+    "icon": "heart"
+  },
+  {
+    "code": "MARATHON",
+    "name": "Marathon",
+    "description": "Finir 15/15 (tout exo)",
+    "xpBonus": 500,
+    "icon": "medal"
+  },
+  {
+    "code": "PERFECT",
+    "name": "Perfection",
+    "description": "45/45 (100%)",
+    "xpBonus": 1000,
+    "icon": "crown"
+  },
+  {
+    "code": "CALC_PRO",
+    "name": "Calculateur Pro",
+    "description": "Finir ADD+SUB+MUL+DIV 15/15",
+    "xpBonus": 800,
+    "icon": "calculator",
+    "requires": ["ADD", "SUB", "MUL", "DIV"]
+  },
+  {
+    "code": "GEOMETER",
+    "name": "Géomètre",
+    "description": "Finir SHAPE_2D+SHAPE_3D+PROP+SYM 15/15",
+    "xpBonus": 800,
+    "icon": "shapes",
+    "requires": ["SHAPE_2D", "SHAPE_3D", "PROP", "SYM"]
+  },
+  {
+    "code": "NUMERATION_PRO",
+    "name": "Numération Pro",
+    "description": "Finir CMP+FRAC+DECI+POURC 15/15",
+    "xpBonus": 800,
+    "icon": "numbers",
+    "requires": ["CMP", "FRAC", "DECI", "POURC"]
+  },
+  {
+    "code": "MEASURES_PRO",
+    "name": "Mesures Pro",
+    "description": "Finir TIME+MES+MONEY 15/15",
+    "xpBonus": 800,
+    "icon": "ruler",
+    "requires": ["TIME", "MES", "MONEY"]
+  },
+  {
+    "code": "LOGICIAN",
+    "name": "Logicien",
+    "description": "Finir SUITE+PROB 15/15",
+    "xpBonus": 600,
+    "icon": "puzzle",
+    "requires": ["SUITE", "PROB"]
+  },
+  {
+    "code": "POLYVALENT",
+    "name": "Polyvalent Maths",
+    "description": "Finir les 26 exos 15/15",
+    "xpBonus": 2000,
+    "icon": "trophy"
+  },
+  {
+    "code": "EARLY_BIRD",
+    "name": "Tôt",
+    "description": "Jouer avant 8h (tout mode)",
+    "xpBonus": 20,
+    "icon": "sunrise"
+  },
+  {
+    "code": "NIGHT_OWL",
+    "name": "Tard",
+    "description": "Jouer après 20h (tout mode)",
+    "xpBonus": 20,
+    "icon": "moon"
+  },
+  {
+    "code": "REGULAR_3",
+    "name": "Régulier (3j)",
+    "description": "Streak 3 jours (≥5 questions/jour)",
+    "xpBonus": 150,
+    "icon": "calendar"
+  },
+  {
+    "code": "REGULAR_7",
+    "name": "Régulier (7j)",
+    "description": "Streak 7 jours (≥5 questions/jour)",
+    "xpBonus": 400,
+    "icon": "calendar"
+  },
+  {
+    "code": "TOP_100",
+    "name": "Top 100 hebdo",
+    "description": "Par exercice, arcade uniquement",
+    "xpBonus": 200,
+    "icon": "ranking"
+  },
+  {
+    "code": "TOP_10",
+    "name": "Top 10 hebdo",
+    "description": "Par exercice, arcade uniquement",
+    "xpBonus": 500,
+    "icon": "ranking"
+  },
+  {
+    "code": "TOP_1",
+    "name": "#1 hebdo",
+    "description": "Par exercice, arcade uniquement",
+    "xpBonus": 1000,
+    "icon": "crown"
+  },
+  {
+    "code": "WORKER",
+    "name": "Bosseur (training)",
+    "description": "50 questions training même semaine",
+    "xpBonus": 150,
+    "icon": "hammer"
+  },
+  {
+    "code": "PERSEVERANT",
+    "name": "Persévérant",
+    "description": "3 blocs training même exo/niveau d'affilée",
+    "xpBonus": 100,
+    "icon": "mountain"
+  },
+  {
+    "code": "READY_ARCADE",
+    "name": "Prêt pour l'Arcade",
+    "description": "80% précision sur 2 blocs training niveau N",
+    "xpBonus": 100,
+    "icon": "rocket"
+  },
+  {
+    "code": "EXPLORER_3",
+    "name": "Explorateur",
+    "description": "Finir 1 niveau dans 3 exos différents",
+    "xpBonus": 100,
+    "icon": "compass"
+  },
+  {
+    "code": "EXPLORER_6",
+    "name": "Aventurier",
+    "description": "Finir 1 niveau dans les 6 exos pilote",
+    "xpBonus": 250,
+    "icon": "compass"
+  },
+  {
+    "code": "FAITHFUL_10",
+    "name": "Fidèle",
+    "description": "10 sessions arcade terminées (tout exo)",
+    "xpBonus": 200,
+    "icon": "heart"
+  },
+  {
+    "code": "MARATHON_3",
+    "name": "Triple marathon",
+    "description": "Finir 15/15 dans 3 exos différents",
+    "xpBonus": 600,
+    "icon": "medal"
+  },
+  {
+    "code": "FLAWLESS_5",
+    "name": "Sans faute ×5",
+    "description": "5 niveaux 3/3 (tout exo, cumul)",
+    "xpBonus": 200,
+    "icon": "star"
+  },
+  {
+    "code": "SPEED_DEMON",
+    "name": "Éclair",
+    "description": "10 ⚡ cumulés (arcade)",
+    "xpBonus": 150,
+    "icon": "bolt"
+  },
+  {
+    "code": "COMEBACK",
+    "name": "Revanche",
+    "description": "Réussir un niveau après 2 échecs (même exo)",
+    "xpBonus": 100,
+    "icon": "refresh"
+  },
+  {
+    "code": "TRAINING_100",
+    "name": "Assidu",
+    "description": "100 questions training cumulées (tout exo)",
+    "xpBonus": 150,
+    "icon": "books"
+  },
+  {
+    "code": "TRAINING_500",
+    "name": "Infatigable",
+    "description": "500 questions training cumulées (tout exo)",
+    "xpBonus": 400,
+    "icon": "books"
+  },
+  {
+    "code": "MENTOR",
+    "name": "Grand frère",
+    "description": "Parent : 2 profils enfants créés + consentement",
+    "xpBonus": 100,
+    "icon": "family"
+  },
+  {
+    "code": "CURIOUS",
+    "name": "Curieux",
+    "description": "Ouvrir l'aide 5 fois (tout exo)",
+    "xpBonus": 50,
+    "icon": "bulb"
+  },
+  {
+    "code": "LISTENER",
+    "name": "Auditeur",
+    "description": "10 lectures TTS (tout mode)",
+    "xpBonus": 50,
+    "icon": "audio"
+  },
+  {
+    "code": "WEEKEND_WARRIOR",
+    "name": "Guerrier du week-end",
+    "description": "Finir 1 niveau arcade samedi ou dimanche",
+    "xpBonus": 80,
+    "icon": "shield"
+  },
+  {
+    "code": "PERFECT_LEVEL_3",
+    "name": "Triple sans faute",
+    "description": "3 niveaux 3/3 d'affilée (même session arcade)",
+    "xpBonus": 250,
+    "icon": "star"
+  },
+  {
+    "code": "LOYAL_30",
+    "name": "Loyal",
+    "description": "Streak 30 jours (≥5 questions/jour)",
+    "xpBonus": 800,
+    "icon": "crown"
+  }
+]

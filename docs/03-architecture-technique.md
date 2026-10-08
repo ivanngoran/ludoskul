@@ -20,7 +20,7 @@
 | Technologie | Version                                       | Justification                                              |
 | ----------- | --------------------------------------------- | ---------------------------------------------------------- |
 | Node.js     | 20 LTS                                        | JS full-stack, performance                                 |
-| Fastify     | 4+                                            | Rapide, schema validation, hooks                           |
+| Fastify     | 5+ (décision 13-L1)                           | Rapide, schema validation, hooks                           |
 | TypeScript  | 5+                                            | Partage types frontend/backend                             |
 | PostgreSQL  | 16+                                           | ACID, JSONB, performances                                  |
 | Prisma      | 5+                                            | Type-safe ORM, migrations                                  |
@@ -173,8 +173,8 @@ GET    /api/config/flags (public, sans auth, cache 60s) — flags pilote6/provid
 
 ```typescript
 // Connexion authentifiée (auth:{token})
-socket.emit("ranking:subscribe", { exerciseCode: "ADD" });
-socket.emit("ranking:unsubscribe", { exerciseCode: "ADD" });
+socket.emit('ranking:subscribe', { exerciseCode: 'ADD' });
+socket.emit('ranking:unsubscribe', { exerciseCode: 'ADD' });
 ```
 
 ### Events Server → Client
@@ -182,26 +182,23 @@ socket.emit("ranking:unsubscribe", { exerciseCode: "ADD" });
 ```typescript
 // Mise à jour temps réel classement (throttle 1/s/room, ≤30KB)
 socket.on(
-  "ranking:update",
+  'ranking:update',
   (data: {
     exerciseCode: string;
     top: RankingEntry[]; // top 100
     me: RankingEntry | null;
     at: string;
-  }) => {},
+  }) => {}
 );
 
 // Mouvement du joueur
 socket.on(
-  "ranking:you-moved",
-  (data: { exerciseCode: string; oldRank: number; newRank: number }) => {},
+  'ranking:you-moved',
+  (data: { exerciseCode: string; oldRank: number; newRank: number }) => {}
 );
 
 // Célébration top 10 uniquement (anti-spam)
-socket.on(
-  "session:celebrated",
-  (data: { pseudo: string; score: number; rank: number }) => {},
-);
+socket.on('session:celebrated', (data: { pseudo: string; score: number; rank: number }) => {});
 ```
 
 // Fallback si WS indisponible : polling `GET ranking` toutes les 15s (même rendu).
@@ -239,7 +236,7 @@ function generateAddition(config: LevelConfig, rng: RNG, index: number) {
 
   return {
     id: `q_${index}`,
-    type: "input", // ou 'choice' pour géométrie
+    type: 'input', // ou 'choice' pour géométrie
     prompt: `${a} + ${b} = ?`,
     answer: answer.toString(),
     options: shuffle([answer, ...distractors], rng),
@@ -289,47 +286,45 @@ interface ExerciseState {
 export const colors = {
   // Primaires par catégorie
   arithmetic: {
-    50: "#fef7ee",
-    100: "#fdedd6",
-    200: "#fad6ac",
-    300: "#f6ba7a",
-    400: "#f19345",
-    500: "#ec6f1a",
-    600: "#de5410",
-    700: "#b83e0e",
-    800: "#933312",
-    900: "#772d10",
+    50: '#fef7ee',
+    100: '#fdedd6',
+    200: '#fad6ac',
+    300: '#f6ba7a',
+    400: '#f19345',
+    500: '#ec6f1a',
+    600: '#de5410',
+    700: '#b83e0e',
+    800: '#933312',
+    900: '#772d10',
   },
   geometry: {
-    50: "#eef7ff",
-    100: "#d6eaff",
-    200: "#add5ff",
-    300: "#7abfff",
-    400: "#42a0ff",
-    500: "#1a7fe0",
-    600: "#1062b8",
-    700: "#0e4c93",
-    800: "#114077",
-    900: "#133661",
+    50: '#eef7ff',
+    100: '#d6eaff',
+    200: '#add5ff',
+    300: '#7abfff',
+    400: '#42a0ff',
+    500: '#1a7fe0',
+    600: '#1062b8',
+    700: '#0e4c93',
+    800: '#114077',
+    900: '#133661',
   },
 
   // Neutres
-  neutral: {
-    /* ... */
-  },
+  neutral: {/* ... */},
 
   // Sémantiques
-  success: "#16a34a",
-  warning: "#f59e0b",
-  error: "#dc2626",
-  info: "#2563eb",
+  success: '#16a34a',
+  warning: '#f59e0b',
+  error: '#dc2626',
+  info: '#2563eb',
 
   // Arrière-plans
   bg: {
-    primary: "#fafafa",
-    secondary: "#ffffff",
-    tertiary: "#f4f4f5",
-    inverse: "#18181b",
+    primary: '#fafafa',
+    secondary: '#ffffff',
+    tertiary: '#f4f4f5',
+    inverse: '#18181b',
   },
 };
 ```

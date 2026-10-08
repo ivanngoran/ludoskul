@@ -4,7 +4,7 @@ Appli web d'exercices maths ludiques 6-14 ans. MVP pilote 6 exos (`ADD,SUB,TAB,S
 
 ## Stack imposée (ne pas changer sans décision 13)
 
-Node 20 LTS + Fastify 4 + Prisma 5 + PostgreSQL 16 + Redis 7 + React 18 + Vite 5 + Tailwind 3 + Socket.io 4. Turborepo + pnpm. ORM Prisma uniquement. Hébergement Vercel (front) + Railway/Render (API). Docker-ready à ajouter.
+Node 20 LTS + Fastify 5 (décision L1, 2026-10-08) + Prisma 5 + PostgreSQL 16 + Redis 7 + React 18 + Vite 5 + Tailwind 3 + Socket.io 4. Turborepo + pnpm. ORM Prisma uniquement. Hébergement Vercel (front) + Railway/Render (API). Docker-ready à ajouter.
 
 ## Architecture
 

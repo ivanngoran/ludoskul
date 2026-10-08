@@ -5,28 +5,29 @@
 
 ## BE-EPIC-1 — Fondations API/DB/Docs
 
-- [-] **BE-1.1 Prisma schema + migrations initiales**
-  Contexte : socle données 08-§1 + 08b-§3 + 03 (SessionMode, 5 catégories).
-  Faire : modèles `User` (+guest,isChild,parentId,rankingPublic,birthYear,email/passwordHash nullables si OIDC/OTP — voir 08-§1), `Identity` (provider,providerSub,emailLower,phoneHash chiffré), `OtpChallenge` (codeHash argon2id,TTL,attempts,resendAt), `Device`, `Family`, `Exercise` (26 lignes seedées : 6 `isActive=true` pilote, 20 `false` v1.1, config JSON extrait 06/06b), `Session` (mode,blockIndex,trainingScore,stopped,assisted,offline,keyboard MVP=false — voir 08-§1 + 10-§1), `Answer` (mode,blockIndex,inputMode mouse|touch en MVP), `Ranking` (arcade-only), `Progress` (2 volets), `Badge` (39 codes opposables 07-§5) + `UserBadge`, `AuthRefresh`, `DeletedPseudo`. IDs `cuid2` partout.
-  Validation : unicités `(provider,providerSub)`, emailLower vérifié unique, phoneHash vérifié unique, `(userId,exerciseId,weekStart)` ranking, `(userId,exerciseId)` progress.
-  Acceptation : `prisma migrate dev` OK vide→seed ; `prisma validate` ; rollback testé ; 0 donnée PII en clair (numéro chiffré).
-  DoD : migration + seed + test cascade delete (user → tout sauf DeletedPseudo 30j).
+- [x] **BE-1.1 Prisma schema + migrations initiales**
+      Contexte : socle données 08-§1 + 08b-§3 + 03 (SessionMode, 5 catégories).
+      Faire : modèles `User` (+guest,isChild,parentId,rankingPublic,birthYear,email/passwordHash nullables si OIDC/OTP — voir 08-§1), `Identity` (provider,providerSub,emailLower,phoneHash chiffré), `OtpChallenge` (codeHash argon2id,TTL,attempts,resendAt), `Device`, `Family`, `Exercise` (26 lignes seedées : 6 `isActive=true` pilote, 20 `false` v1.1, config JSON extrait 06/06b), `Session` (mode,blockIndex,trainingScore,stopped,assisted,offline,keyboard MVP=false — voir 08-§1 + 10-§1), `Answer` (mode,blockIndex,inputMode mouse|touch en MVP), `Ranking` (arcade-only), `Progress` (2 volets), `Badge` (39 codes opposables 07-§5) + `UserBadge`, `AuthRefresh`, `DeletedPseudo`. IDs `cuid2` partout.
+      Validation : unicités `(provider,providerSub)`, emailLower vérifié unique, phoneHash vérifié unique, `(userId,exerciseId,weekStart)` ranking, `(userId,exerciseId)` progress.
+      Acceptation : `prisma migrate dev` OK vide→seed ; `prisma validate` ; rollback testé ; 0 donnée PII en clair (numéro chiffré).
+      DoD : migration + seed + test cascade delete (user → tout sauf DeletedPseudo 30j).
 
-- [ ] **BE-1.2 Fastify app + plugins + santé + config**
+- [x] **BE-1.2 Fastify app + plugins + santé + config**
       Faire : `app.ts` (cors origine front seule, helmet CSP/HSTS/nosniff, rate-limit global, request-id, logs JSON sans PII, `GET /health` + `/ready` DB/Redis, gestion erreurs `{error:{code,message}}`, Swagger `/api/docs`).
       ENV : `DATABASE_URL, REDIS_URL, JWT_SECRET/REFRESH(≥32), GOOGLE_*, APPLE_*, WHATSAPP_*, SMS_*, FRONT_URL, OTP_*`. Secrets jamais en repo.
       Acceptation : `/health` 200 <50ms ; CORS refuse origine inconnue ; header CSP présent ; log sans email/téléphone/code.
       DoD : README run local + CI verte.
 
-- [ ] **BE-1.3 Seed référentiel + badges**
+- [x] **BE-1.3 Seed référentiel + badges**
       Faire : seed 26 exos (ordre, icon, color, category CALCUL/NOMBRES/MESURES/GEOMETRIE/LOGIQUE, help) + 39 badges (07-§5 : arcade, training Bosseur/Persévérant/Prêt, Top hebdo, pros, fun). 6 pilotes actifs.
       Acceptation : `GET exercises` retourne 6 actifs + `?includeInactive` 26 ; badges listés 39.
       DoD : script `db:seed` idempotent + test.
 
-- [ ] **BE-1.4 CI + OpenAPI + qualité socle**
+- [x] **BE-1.4 CI + OpenAPI + qualité socle**
       Faire : GitHub Actions (lint, typecheck, test, migrate-check, audit 0 high/critical), OpenAPI généré depuis Zod, SBOM mensuel.
       Acceptation : PR bloquée si test rouge ou vulnérabilité high+.
       DoD : badge CI vert + `/api/docs` à jour.
+      Réalisé 2026-10-08 : CI avec Postgres 16 de service (`migrate deploy` + `db:seed` + `db:seed:check`), `prisma validate`, `lint` + `typecheck` + `test` + `build`, `openapi:gen/check` vert, audit prod 0 high/critical (`pnpm audit --prod`). Audit global : 3 dev-only restantes (`tinypool` via vitest 3, `braces` via tailwind 3 — v1.1). Stack Fastify 5 (décision 13-L1).
 
 ## BE-EPIC-2 — Auth multi-provider + mineurs + devices (08b)
 

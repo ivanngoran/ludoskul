@@ -45,6 +45,12 @@
 
 - `OUVERT` : verrou parental (durée/jour, couvre-feu), rappel pause toutes les 20 min ? `RECOMMANDÉ` : rappel doux v1.1, pas de blocage MVP (hors périmètre, note en 10).
 
+## L. Stack backend — TRANCHÉ : L1 Fastify 5 (2026-10-08, BE-1.4)
+
+- Passage Fastify 4 → 5 imposé par l'audit sécu : Fastify 4 (<5.12.2) = 5 vulnérabilités high (bypass validation/auth, GHSA-jx2c-rxcm-jvmq, GHSA-667r-xxjv-c9mm, GHSA-p68q-wchp-6fh7, GHSA-hwr6-493r-vm6h, GHSA-c96f-x56v-gq3h). Après migration : 0 high/critical sur `fastify` et ses plugins (`@fastify/cors 11`, `helmet 13`, `rate-limit 11`, `swagger 9`, `swagger-ui 6`).
+- Changement code minimal : typage `setErrorHandler((err: FastifyError, ...))` (Fastify 5 type `err: unknown` par défaut). Contrats 08/08b inchangés, `openapi:check` vert.
+- Reste hors prod (dev-only, non bloquant) : `tinypool` via `vitest 3` (2 critical) + `braces` via `tailwindcss 3/chokidar` (1 high, sans patch). Audit prod (`pnpm audit --prod`) = 0 high/critical. Montée `vitest 4` / `tailwindcss 4` reportée en v1.1 (risque régression).
+
 ## Prochaine étape (version 2026-09-28 : A-D tranchées le 2026-09-17, E-K appliquées le 2026-09-24)
 
 - A-D : voir §A-D ci-dessus (pilote 6, parent simple, TTS, 100 % gratuit).

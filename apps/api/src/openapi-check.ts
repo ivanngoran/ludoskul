@@ -4,6 +4,7 @@ const required = [
     ['GET', '/health'],
     ['GET', '/api/exercises'],
     ['GET', '/api/exercises/:code'],
+    ['GET', '/api/badges'],
     ['POST', '/api/sessions'],
     ['GET', '/api/sessions/active'],
     ['POST', '/api/sessions/:id/training-level'],

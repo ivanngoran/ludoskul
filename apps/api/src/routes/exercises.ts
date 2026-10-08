@@ -1,5 +1,18 @@
 import type { FastifyInstance } from 'fastify';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { EXERCISES, timeLimitForLevel } from '@ludoskul/shared';
+
+const seedsDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'prisma', 'seeds');
+const seedBadges = JSON.parse(readFileSync(join(seedsDir, 'badges.json'), 'utf8')) as Array<{
+    code: string;
+    name: string;
+    description: string;
+    xpBonus: number;
+    icon: string;
+    requires?: string[];
+}>;
 
 export async function exerciseRoutes(app: FastifyInstance): Promise<void> {
     app.get('/api/exercises', async (req) => {
@@ -40,4 +53,9 @@ export async function exerciseRoutes(app: FastifyInstance): Promise<void> {
         const { level, index } = req.query as { level?: string; index?: string };
         return { audioSrc: `/audio/${code}/${level ?? 1}/${index ?? 0}.mp3`, fallbackTTS: true };
     });
+
+    // BE-1.3 : référentiel badges 07-§5 (39 codes). Attribution serveur en BE-6.2.
+    app.get('/api/badges', async () => ({
+        badges: seedBadges.map((b) => ({ ...b, earned: false, earnedAt: null })),
+    }));
 }

@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ludoskul-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ludoskul}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ludoskul}
+      POSTGRES_DB: ${POSTGRES_DB:-ludoskul}
+    ports:
+      - "${POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - ludoskul-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-ludoskul} -d $${POSTGRES_DB:-ludoskul}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  ludoskul-postgres-data:
