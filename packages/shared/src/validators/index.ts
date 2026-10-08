@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { exerciseCodeSchema, inputModeSchema, sessionModeSchema } from '../types/index.js';
 
+export * from './auth.js';
+
 export const cuidSchema = z.string().min(1);
 
 export const createSessionSchema = z.object({
@@ -26,14 +28,6 @@ export const trainingLevelSchema = z.object({
 export const completeSessionSchema = z.object({
     assisted: z.boolean().default(false),
 });
-
-export const pseudoSchema = z
-    .string()
-    .min(3)
-    .max(16)
-    .regex(/^[A-Za-z0-9_-]+$/);
-
-export const emailSchema = z.string().trim().toLowerCase().email();
 
 export const errorResponseSchema = z.object({
     error: z.object({

@@ -1,6 +1,9 @@
-# @ludoskul/api — Run local (BE-1.2 / BE-1.4)
+# @ludoskul/api — Run local (BE-1.2 / BE-1.4 + BE-EPIC-2 auth)
 
-Socle fondations BE-EPIC-01 : Fastify 4 + Prisma 5 + PostgreSQL 16.
+Socle fondations BE-EPIC-01 : Fastify 5 + Prisma 5 + PostgreSQL 16.
+Auth BE-EPIC-02 (08b) : email OTP + magic link, password, OAuth Google/Apple
+(mocks hors prod), phone/WhatsApp→SMS (mocks), invité + upgrade, identities,
+devices + refresh rotation, famille + consentement, profil, fusion.
 
 ## Prérequis
 
@@ -44,6 +47,23 @@ Santé :
 - `GET http://localhost:3001/api/exercises` → 6 pilotes
 - `GET http://localhost:3001/api/exercises?includeInactive=1` → 26
 - `GET http://localhost:3001/api/badges` → 39
+
+Auth (BE-EPIC-2, 08b-§4) — hors prod, `debug:{code,magicToken}` retourné
+(provider mail/SMS mock, jamais loggé) :
+
+- `POST /api/auth/email/code {email,purpose}` → 200 générique
+- `POST /api/auth/email/verify {email,code,pseudo?}` → 201/200 + tokens
+- `GET /api/auth/email/magic?token=` → one-shot
+- `POST /api/auth/register|login` + `POST /api/auth/password/forgot|reset`
+- `GET /api/auth/oauth/:provider/url` + `GET .../callback?code&state`
+  (mocks : `OAUTH_MOCK=1` + code pré-enregistré côté serveur)
+- `POST /api/auth/phone/code|verify` (WhatsApp puis SMS même code)
+- `POST /api/auth/guest` + `POST /api/auth/guest/upgrade` (****** + preuve)
+- `GET|DELETE /api/auth/identities[/:provider]` (garde dernier moyen)
+- `POST /api/auth/refresh|logout` + `GET|DELETE /api/auth/devices[/:id]`
+- `GET|PATCH|DELETE /api/auth/me` + `POST /api/auth/merge/confirm`
+- `POST|GET /api/family/children` + `PATCH|DELETE /api/family/children/:id`
+- `POST /api/family/invite` + `GET /api/family/join?token=`
 
 ## 3. Migrations (dès Docker OK)
 

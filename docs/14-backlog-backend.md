@@ -31,56 +31,56 @@
 
 ## BE-EPIC-2 — Auth multi-provider + mineurs + devices (08b)
 
-- [-] **BE-2.1 Email OTP code + verify + lien magique (défaut enfants)**
+- [x] **BE-2.1 Email OTP code + verify + lien magique (défaut enfants)**
       Faire : `POST email/code {email,purpose}` → toujours 200 générique + crée `OtpChallenge` (code 6, TTL 15min, resend 60s) + envoi (provider mail) ; `POST email/verify {email,code,pseudo?}` → vérifie (5 essais max puis invalidé), crée/lie `User+Identity email` (fusion si emailLower vérifié existant), émet access(15min)+refresh(HttpOnly 7j, Device créé) ; `GET email/magic?token` one-shot idem.
       Règles : normalisation lowercase+trim, anti-énumération stricte, rate 5/h/email + 20/h/IP.
       Acceptation : register inconnu + login connu mêmes réponses 200 ; code expiré → `OTP_EXPIRED` ; 6e essai → `OTP_TOO_MANY_ATTEMPTS` ; resend <60s → `RESEND_TOO_SOON`.
       Tests : TTL, essais, fusion doublon, refresh rotation.
 
-- [ ] **BE-2.2 Email password register/login + reset (parents/enseignants)**
+- [x] **BE-2.2 Email password register/login + reset (parents/enseignants)**
       Faire : `POST register {email,pseudo,password≥8+1chiffre}` (bcrypt12, `EMAIL_TAKEN/PSEUDO_TAKEN/WEAK_PASSWORD`), `POST login {emailOrPseudo,password}` (`INVALID_CREDENTIALS` générique), forgot/reset via OTP email (réutilise BE-2.1, TTL 15min). Partage `Identity email` avec BE-2.1.
       Acceptation : login pseudo ou email OK ; timing-safe ; reset invalide ancien password.
       DoD : tests + audit log sans password.
 
-- [ ] **BE-2.3 OAuth Google + Apple URL/callback/link**
+- [x] **BE-2.3 OAuth Google + Apple URL/callback/link**
       Faire : `GET oauth/:provider/url` (PKCE S256, state/nonce stockés 10min) ; `GET oauth/:provider/callback?code&state` (échange, vérif id_token JWKS, `email_verified` exigé, Apple relay accepté comme email distinct) → crée/lie (fusion email vérifié) + tokens+Device ; `POST oauth/:provider/link` (Bearer + code) → `ALREADY_LINKED/EMAIL_CONFLICT` (si conflit : propose fusion seulement si email vérifié identique, sinon 409 + `suggestedAction:"use_other_account"`).
       Boutons officiels côté front, jamais de secret côté client.
       Acceptation : mocks OIDC (email non vérifié rejeté) ; relay Apple crée identité séparée ; link doublon → 409 ; unlink dernier moyen refusé (BE-2.6).
       Tests : PKCE, state mismatch, JWKS rotation.
 
-- [ ] **BE-2.4 Téléphone/WhatsApp OTP + fallback SMS**
+- [x] **BE-2.4 Téléphone/WhatsApp OTP + fallback SMS**
       Faire : `POST phone/code {phone(E.164),channel:auto|whatsapp|sms}` → normalise (libphonenumber), crée challenge (6 chiffres, TTL 5min, resend 60s), envoie WhatsApp template `Votre code Ludoskul : {{1}}. 5 min.` ; si non distribué 30s ou non-WhatsApp → SMS même code (pas de nouveau code) ; réponse `{sent:true,channel,expiresIn:300,resendIn:60}` générique. `POST phone/verify {phone,code,pseudo?}` → lie/crée + tokens.
       Règles : 5 codes/h/numéro, 5 vérifs/challenge, 20/h/IP ; stockage `phoneHash` unique + E.164 chiffré ; logs hash seul ; coûts : compteur + alerte seuil.
       Acceptation : E.164 invalide → `PHONE_INVALID` ; expiré → `OTP_EXPIRED` ; 6e → verrou ; fallback SMS testé mock ; même code WhatsApp/SMS.
       Tests : cooldown, fusion même numéro, affichage masqué `+33 6 •• •• 42 18`.
 
-- [ ] **BE-2.5 Invité + upgrade sans perte**
+- [x] **BE-2.5 Invité + upgrade sans perte**
       Faire : `POST guest {pseudo}` → `User guest=true` + Device léger (ou offline-first : UUID local, upgrade différé) ; `POST guest/upgrade` (Bearer guest + preuve provider BE-2.1/2.3/2.4) → merge : garde xp/sessions/answers/progress/badges (réassigne userId en transaction), `guest=false`, lie Identity. Bandeau front `Non sauvegardé` tant que guest.
       Acceptation : sessions guest conservées après upgrade (compte answers avant/après identique) ; double upgrade idempotent ; guest supprimable sans cascade lointaine.
       Tests : merge conflit pseudo, offline guest → online upgrade.
 
-- [ ] **BE-2.6 Identities link/unlink + garde dernier moyen**
+- [x] **BE-2.6 Identities link/unlink + garde dernier moyen**
       Faire : `GET identities` ; `DELETE identities/:provider` → refuse `LAST_AUTH_METHOD` si dernier actif ; `EMAIL_CONFLICT` avec proposition fusion. Audit `lastUsedAt`.
       Acceptation : unlink OAuth quand email+phone restent → 204 ; unlink dernier → 409 + message FR.
       Tests : garde + audit.
 
-- [ ] **BE-2.7 Devices + refresh rotation + logout**
+- [x] **BE-2.7 Devices + refresh rotation + logout**
       Faire : refresh rotation à chaque usage (ancien révoqué, détection réutilisation = révocation famille + alerte), `GET devices`, `DELETE devices/:id`, `POST logout` (device courant). Access 15min mémoire front, refresh HttpOnly Lax 7j.
       Acceptation : vol refresh détecté → tous devices révoqués + `TOKEN_EXPIRED` ; liste devices correcte ; logout n'affecte pas autres devices.
       Tests : rotation, replay, multi-device.
 
-- [ ] **BE-2.8 Famille + consentement + rankingPublic**
+- [x] **BE-2.8 Famille + consentement + rankingPublic**
       Faire : `POST family/children {pseudo,birthYear}` (Bearer parent vérifié) → crée `User isChild,parentId,rankingPublic=false` + `consentAt/consentText=v1` ; `GET family/children` → progression par enfant (arcade+training) ; code/QR famille pour connexion enfant sur appareil partagé (token court 10min, one-shot) ; `PATCH family/children/:id {rankingPublic}` (parent seul, explicite).
       Règles FR 15 ans défaut (08b-§2) : <15 ans exige parent ; pseudos modérés ; jamais email/tél enfant.
       Acceptation : enfant <15 sans parent → `PARENTAL_CONSENT_REQUIRED` ; ranking enfant exclu Top public mais badges OK ; export/suppression par enfant (BE-6.4).
       Tests : consentement, QR expiry, rankingPublic toggle.
 
-- [ ] **BE-2.9 Profil lecture/MAJ/suppression**
+- [x] **BE-2.9 Profil lecture/MAJ/suppression**
       Faire : `GET me` (+guest,rankingPublic,providers,devices,isChild), `PATCH me` (pseudo/avatar/country/theme/accessibility + validation), `DELETE me` (vérification password|OTP|OAuth + purge cascade + DeletedPseudo 30j + libération email/phone immédiate).
       Acceptation : pseudo pris → `PSEUDO_TAKEN` ; delete vérifie second facteur ; export avant delete possible (BE-6.4).
       Tests : cascade + réserve pseudo.
 
-- [ ] **BE-2.10 Fusion confirmée + suppression enfant (patch 16-P1)**
+- [x] **BE-2.10 Fusion confirmée + suppression enfant (patch 16-P1)**
       Contexte : BE-2.3/2.4/2.1 détectent `EMAIL_CONFLICT` (même email vérifié sur 2 Users) ou parent veut retirer un profil enfant. Sans endpoint dédié, le front resterait bloqué en 409.
       Faire : `POST auth/merge/confirm {sourceUserId?, targetEmail, proof:(OTP|OAuth code frais <10min)}` → fusion transactionnelle (garde le User vérifié le plus ancien comme cible, réassigne Identity/Device/Session/Answer/Ranking/Progress/Badges/Family, supprime source, audit) ; `DELETE family/children/:id` (Bearer parent, vérification + confirm, cascade enfant + réserve pseudo 30j, ranking enfant retiré ≤60s).
       Règles : fusion seulement si email/phone **vérifié identique** des 2 côtés (sinon 409 + `suggestedAction`), jamais auto ; enfant : parent seul ; export proposé avant (BE-6.4).
