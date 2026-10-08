@@ -31,7 +31,7 @@
 
 ## BE-EPIC-2 — Auth multi-provider + mineurs + devices (08b)
 
-- [ ] **BE-2.1 Email OTP code + verify + lien magique (défaut enfants)**
+- [-] **BE-2.1 Email OTP code + verify + lien magique (défaut enfants)**
       Faire : `POST email/code {email,purpose}` → toujours 200 générique + crée `OtpChallenge` (code 6, TTL 15min, resend 60s) + envoi (provider mail) ; `POST email/verify {email,code,pseudo?}` → vérifie (5 essais max puis invalidé), crée/lie `User+Identity email` (fusion si emailLower vérifié existant), émet access(15min)+refresh(HttpOnly 7j, Device créé) ; `GET email/magic?token` one-shot idem.
       Règles : normalisation lowercase+trim, anti-énumération stricte, rate 5/h/email + 20/h/IP.
       Acceptation : register inconnu + login connu mêmes réponses 200 ; code expiré → `OTP_EXPIRED` ; 6e essai → `OTP_TOO_MANY_ATTEMPTS` ; resend <60s → `RESEND_TOO_SOON`.
