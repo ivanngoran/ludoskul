@@ -6,12 +6,13 @@ const dbReady = dbUrl.length > 0;
 
 // DoD BE-1.1 : la cascade RGPD doit être prouvée au moins en CI (service Postgres).
 // En local sans DATABASE_URL le test est skippé ; en CI il est obligatoire.
-if (!dbReady && process.env.CI) {
-    throw new Error('DATABASE_URL requis en CI pour le test cascade RGPD (DoD BE-1.1)');
-}
-
+// Revue BE-EPIC-01 #10 : le garde CI est DANS le test (pas de throw au chargement
+// qui court-circuiterait describe.runIf avant le skip).
 describe.runIf(dbReady)('BE-1.1 cascade delete RGPD (DB live)', () => {
     it('delete User → cascade tout sauf DeletedPseudo', async () => {
+        if (!dbReady && process.env.CI) {
+            throw new Error('DATABASE_URL requis en CI pour le test cascade RGPD (DoD BE-1.1)');
+        }
         const prisma = new PrismaClient();
         const suffix = Date.now().toString(36);
         const user = await prisma.user.create({

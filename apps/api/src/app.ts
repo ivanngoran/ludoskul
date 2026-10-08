@@ -42,6 +42,34 @@ export async function buildApp(): Promise<FastifyInstance> {
     // Placé AVANT les register : les contextes encapsulés héritent du handler
     // parent au moment de leur création (sinon le handler par défaut sérialise
     // l'erreur brute, ex 429 avec statusCode/error exposés).
+    // Codes opposables 08-§7 : tout code Fastify interne (FST_*) est remappé vers
+    // VALIDATION_ERROR FR ; seuls les codes opposables passent tels quels.
+    const OPPOSABLE_CODES = new Set([
+        'VALIDATION_ERROR',
+        'UNAUTHORIZED',
+        'TOKEN_EXPIRED',
+        'EMAIL_TAKEN',
+        'PSEUDO_TAKEN',
+        'INVALID_CREDENTIALS',
+        'WEAK_PASSWORD',
+        'INVALID_OTP',
+        'OTP_EXPIRED',
+        'OTP_TOO_MANY_ATTEMPTS',
+        'RESEND_TOO_SOON',
+        'PHONE_INVALID',
+        'PARENTAL_CONSENT_REQUIRED',
+        'BLOCK_IN_PROGRESS',
+        'LAST_AUTH_METHOD',
+        'ALREADY_LINKED',
+        'EMAIL_CONFLICT',
+        'ANSWER_REJECTED',
+        'KEYBOARD_NOT_ALLOWED',
+        'RATE_LIMITED',
+        'NOT_FOUND',
+        'CONFLICT',
+        'FORBIDDEN',
+        'INTERNAL',
+    ]);
     app.setErrorHandler((err: FastifyError, req, reply) => {
         const status = err.statusCode ?? 500;
         if (status >= 500) {
@@ -51,15 +79,28 @@ export async function buildApp(): Promise<FastifyInstance> {
                 error: { code: 'INTERNAL', message: 'Une erreur interne est survenue, réessaie plus tard.' },
             });
         }
-        // Validation Fastify (schémas OpenAPI) → code opposable VALIDATION_ERROR FR.
-        if (err.code === 'FST_ERR_VALIDATION') {
+        // Validation Fastify (schémas OpenAPI) + body JSON invalide → VALIDATION_ERROR FR.
+        if (err.code === 'FST_ERR_VALIDATION' || err.code === 'FST_ERR_CTP_INVALID_JSON_BODY' || err.code === 'FST_ERR_CTP_EMPTY_JSON_BODY') {
+            return reply.status(400).send({
+                error: { code: 'VALIDATION_ERROR', message: 'Requête invalide' },
+            });
+        }
+        // Tout autre code Fastify interne (FST_*) : jamais exposé tel quel (08-§7 FR).
+        if (err.code?.startsWith('FST_')) {
             return reply.status(status).send({
                 error: { code: 'VALIDATION_ERROR', message: 'Requête invalide' },
             });
         }
-        const code = err.code ?? 'INTERNAL';
-        const message = typeof err.message === 'string' && err.message.length > 0 ? err.message : 'Requête invalide';
+        const code = err.code && OPPOSABLE_CODES.has(err.code) ? err.code : 'VALIDATION_ERROR';
+        const message =
+            err.code && OPPOSABLE_CODES.has(err.code) && typeof err.message === 'string' && err.message.length > 0
+                ? err.message
+                : 'Requête invalide';
         return reply.status(status).send({ error: { code, message } });
+    });
+    // 404 route inconnue au même format opposable (08-§2) : setErrorHandler ne couvre pas le 404 par défaut.
+    app.setNotFoundHandler((_req, reply) => {
+        return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Ressource inconnue' } });
     });
     // CORS = origine front seule (10-§2). Refuse origine inconnue.
     await app.register(cors, { origin: config.corsOrigins });
@@ -72,8 +113,9 @@ export async function buildApp(): Promise<FastifyInstance> {
     await app.register(rateLimit, {
         max: Number(process.env.RATE_LIMIT_MAX ?? rateLimits.globalMax),
         timeWindow: rateLimits.globalWindow,
-        // Tests : pas de rate-limit sauf RATE_LIMIT_MAX explicite (test 429 dédié).
-        allowList: () => process.env.NODE_ENV === 'test' && !process.env.RATE_LIMIT_MAX,
+        // Tests/CI : RATE_LIMIT_DISABLED=1 désactive le global (sondes/staging).
+        // NODE_ENV=test seul ne suffit plus (staging fragile, revue BE-EPIC-01 #7).
+        allowList: () => process.env.RATE_LIMIT_DISABLED === '1' || (process.env.NODE_ENV === 'test' && !process.env.RATE_LIMIT_MAX),
         // 429 au format opposable {error:{code,message}} FR (08-§2, backend.instructions).
         errorResponseBuilder: (_req, context) => {
             const err = new Error(`Trop de requêtes, réessaie dans ${context.after}.`) as FastifyError;

@@ -56,7 +56,7 @@ describe('BE-1.1 Prisma schema socle 08-§1 + 08b-§3', () => {
         }
     });
 
-    it('IDs cuid partout (Prisma5: cuid(), cible cuid2 côté app)', () => {
+    it('IDs cuid2 partout : Prisma5 @default(cuid()) + génération app @paralleldrive/cuid2', () => {
         const s = readSchema();
         // 08-§1 + 17-§2 : IDs cuid2 partout. Prisma 5 → @default(cuid()), génération cuid2 via lib.
         expect(s).toContain('cuid2');
@@ -66,6 +66,12 @@ describe('BE-1.1 Prisma schema socle 08-§1 + 08b-§3', () => {
         expect(s).not.toContain('@default(cuid(2))');
         expect(s).not.toContain('@default(uuid())');
         expect(s).not.toContain('autoincrement()');
+        // Revue BE-EPIC-01 #6 : le commentaire seul ne suffit pas — la génération
+        // applicative cuid2 doit être réellement utilisée (sessions + pseudos).
+        const sessionsSrc = readFileSync(join(dir, '..', 'src', 'routes', 'sessions.ts'), 'utf8');
+        expect(sessionsSrc).toContain('@paralleldrive/cuid2');
+        const usersSrc = readFileSync(join(dir, '..', 'src', 'modules', 'auth', 'users.ts'), 'utf8');
+        expect(usersSrc).toContain('@paralleldrive/cuid2');
     });
 
     it('unicités opposables BE-1.1', () => {

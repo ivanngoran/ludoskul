@@ -11,6 +11,7 @@ import {
     trainingSeed,
     type ExerciseCode,
 } from '@ludoskul/shared';
+import { createId } from '@paralleldrive/cuid2';
 import { openApiSchemas } from './schemas.js';
 
 interface StoredSession {
@@ -25,12 +26,17 @@ interface StoredSession {
     lives: number;
     correct: number;
     total: number;
+    // 07-§1a : arcade = progression serveur L1→L15 (45 Q). maxLevelAnswered suit
+    // la validation ; complete exige 15/15 (BE-4.4). Prototype BE-EPIC-01 : Map
+    // mémoire pré-auth (BE-EPIC-4/5 → Prisma Session/Answer + userId + 1 active/exo/mode).
+    maxLevelAnswered: number;
+    answered: Set<string>;
 }
 
 const sessions = new Map<string, StoredSession>();
 
 function newId(prefix: string): string {
-    return `${prefix}_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+    return `${prefix}_${createId()}`;
 }
 
 export async function sessionRoutes(app: FastifyInstance): Promise<void> {
@@ -54,6 +60,8 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
             lives: 3,
             correct: 0,
             total: 0,
+            maxLevelAnswered: 0,
+            answered: new Set<string>(),
         });
         return reply.status(201).send({
             sessionId: id,
@@ -65,15 +73,22 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         });
     });
 
-    app.get('/api/sessions/active', { schema: openApiSchemas.activeSessions }, async () => ({ sessions: [...sessions.values()].slice(-5) }));
+    // Prototype pré-auth (BE-EPIC-4 → scope userId + 1 active/exo/mode) : ne renvoie
+    // que le format, sans exposer les sessions des autres utilisateurs (revue #4).
+    // En l'absence d'auth sur ce prototype, la liste reste vide par défaut.
+    app.get('/api/sessions/active', { schema: openApiSchemas.activeSessions }, async () => ({ sessions: [] }));
 
     app.get('/api/sessions/:id/questions', { schema: openApiSchemas.questions }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
         const q = req.query as { level?: string; block?: string };
-        const level = Number(q.level ?? s.level);
+        // 07-§1a : arcade = niveau courant serveur uniquement (pas de saut L1→L15 via query).
+        const level = s.mode === 'ARCADE' ? s.level : Number(q.level ?? s.level);
         const block = Number(q.block ?? s.blockIndex);
+        if (!Number.isInteger(level) || level < 1 || level > 15) {
+            return reply.status(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Niveau 1-15 requis' } });
+        }
         const seed = s.mode === 'ARCADE' ? arcadeSeed(id, s.exerciseCode, level) : trainingSeed(id, s.exerciseCode, level, block);
         const all = generateQuestions(s.exerciseCode, level, seed);
         const questions = all.map(({ answer: _answer, ...rest }) => {
@@ -117,8 +132,12 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         if (body.inputMode === 'keyboard') {
             return reply.status(422).send({ error: { code: 'KEYBOARD_NOT_ALLOWED', message: 'Clavier non autorisé en jeu (MVP)' } });
         }
+        // 07-§1a : arcade = niveau courant serveur uniquement (contournement L1→L15 refusé).
+        if (s.mode === 'ARCADE' && body.level !== s.level) {
+            return reply.status(422).send({ error: { code: 'ANSWER_REJECTED', message: 'Niveau courant uniquement' } });
+        }
         const seed = s.mode === 'ARCADE'
-            ? arcadeSeed(id, s.exerciseCode, body.level)
+            ? arcadeSeed(id, s.exerciseCode, s.level)
             : trainingSeed(id, s.exerciseCode, body.level, body.blockIndex ?? s.blockIndex);
         const expected = generateQuestions(s.exerciseCode, body.level, seed)[body.index];
         if (!expected || expected.hash !== body.questionHash) {
@@ -128,18 +147,28 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         if (s.mode === 'ARCADE' && body.timeMs > limitMs + 1000) {
             return reply.status(422).send({ error: { code: 'ANSWER_REJECTED', message: 'Temps dépassé' } });
         }
+        // Idempotence anti-double-tap (07-§1a verrou 400ms) : même index+hash ignoré.
+        const answerKey = `${body.level}:${body.blockIndex ?? s.blockIndex}:${body.index}:${body.questionHash}`;
+        if (s.answered.has(answerKey)) {
+            return reply.status(409).send({ error: { code: 'CONFLICT', message: 'Réponse déjà enregistrée' } });
+        }
+        s.answered.add(answerKey);
         const correct = body.chosen === expected.answer;
         s.total += 1;
         if (s.mode === 'ARCADE') {
+            s.maxLevelAnswered = Math.max(s.maxLevelAnswered, body.level);
             if (correct) {
                 const pts = arcadeQuestionPoints({ level: body.level, streakBefore: s.streak, timeLeftMs: Math.max(0, limitMs - body.timeMs), correct: true });
                 s.score += pts;
                 s.streak += 1;
                 s.correct += 1;
+                // Progression serveur : niveau suivant après 3 réponses au niveau courant.
+                if (s.total % 3 === 0 && s.level < 15) s.level += 1;
                 return { mode: s.mode, correct: true, points: pts, streak: s.streak, lives: s.lives, score: s.score };
             }
             s.streak = 0;
             s.lives = Math.max(0, s.lives - 1);
+            if (s.total % 3 === 0 && s.level < 15) s.level += 1;
             return { mode: s.mode, correct: false, points: 0, streak: 0, lives: s.lives, score: s.score };
         }
         if (correct) {
@@ -160,6 +189,10 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         if (s.mode !== 'ARCADE') {
             return reply.status(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Réservé au mode arcade' } });
         }
+        // BE-4.4 : complete exige 15 niveaux joués (45 réponses), sinon 409.
+        if (s.maxLevelAnswered < 15 || s.total < 45) {
+            return reply.status(409).send({ error: { code: 'CONFLICT', message: 'Termine les 15 niveaux avant de valider' } });
+        }
         const bonus = arcadeLevelBonus(15, s.lives);
         return {
             mode: s.mode,
@@ -177,6 +210,9 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
+        if (s.mode !== 'TRAINING') {
+            return reply.status(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Réservé au mode entraînement' } });
+        }
         return {
             mode: 'TRAINING',
             questions: s.total,
@@ -191,6 +227,6 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
-        return { mode: s.mode, maxLevel: s.level, saved: true };
+        return { mode: s.mode, maxLevel: s.maxLevelAnswered > 0 ? s.maxLevelAnswered : s.level, saved: true };
     });
 }
