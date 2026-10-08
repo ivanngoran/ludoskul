@@ -1,4 +1,5 @@
 import Fastify, { type FastifyError, type FastifyInstance } from 'fastify';
+import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
@@ -10,6 +11,16 @@ import { healthRoutes } from './routes/health.js';
 import { exerciseRoutes } from './routes/exercises.js';
 import { sessionRoutes } from './routes/sessions.js';
 import { configRoutes } from './routes/schemas.js';
+import { emailOtpRoutes } from './routes/auth-email.js';
+import { passwordRoutes } from './routes/auth-password.js';
+import { oauthRoutes } from './routes/auth-oauth.js';
+import { phoneRoutes } from './routes/auth-phone.js';
+import { guestRoutes } from './routes/auth-guest.js';
+import { identityRoutes } from './routes/auth-identities.js';
+import { deviceRoutes } from './routes/auth-devices.js';
+import { familyRoutes } from './routes/auth-family.js';
+import { profileRoutes } from './routes/auth-profile.js';
+import { mergeRoutes } from './routes/auth-merge.js';
 
 export async function buildApp(): Promise<FastifyInstance> {
     // Fail-fast prod (10-§2, 19-§2) : CORS/JWT requis avant tout plugin.
@@ -59,8 +70,10 @@ export async function buildApp(): Promise<FastifyInstance> {
         noSniff: true,
     });
     await app.register(rateLimit, {
-        max: rateLimits.globalMax,
+        max: Number(process.env.RATE_LIMIT_MAX ?? rateLimits.globalMax),
         timeWindow: rateLimits.globalWindow,
+        // Tests : pas de rate-limit sauf RATE_LIMIT_MAX explicite (test 429 dédié).
+        allowList: () => process.env.NODE_ENV === 'test' && !process.env.RATE_LIMIT_MAX,
         // 429 au format opposable {error:{code,message}} FR (08-§2, backend.instructions).
         errorResponseBuilder: (_req, context) => {
             const err = new Error(`Trop de requêtes, réessaie dans ${context.after}.`) as FastifyError;
@@ -69,6 +82,7 @@ export async function buildApp(): Promise<FastifyInstance> {
             return err;
         },
     });
+    await app.register(cookie);
     // Traçabilité sans PII : expose l'id requête en réponse (corrélé aux logs JSON).
     app.addHook('onSend', async (req, reply) => {
         reply.header('x-request-id', req.id);
@@ -81,5 +95,15 @@ export async function buildApp(): Promise<FastifyInstance> {
     await app.register(exerciseRoutes);
     await app.register(sessionRoutes);
     await app.register(configRoutes);
+    await app.register(emailOtpRoutes);
+    await app.register(passwordRoutes);
+    await app.register(oauthRoutes);
+    await app.register(phoneRoutes);
+    await app.register(guestRoutes);
+    await app.register(identityRoutes);
+    await app.register(deviceRoutes);
+    await app.register(familyRoutes);
+    await app.register(profileRoutes);
+    await app.register(mergeRoutes);
     return app;
 }

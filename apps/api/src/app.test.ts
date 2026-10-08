@@ -105,18 +105,25 @@ describe('BE-1.2 Fastify app + santé + config (10-§2)', () => {
     });
 
     it('429 au format {error:{code:RATE_LIMITED}} FR', async () => {
-        const app = await buildApp();
-        let body = '';
-        for (let i = 0; i < 120; i++) {
-            const r = await app.inject({ method: 'GET', url: '/api/exercises' });
-            if (r.statusCode === 429) {
-                body = r.body;
-                break;
+        process.env.RATE_LIMIT_MAX = '5';
+        let app;
+        try {
+            const { buildApp: build } = await import('./app.js');
+            app = await build();
+            let body = '';
+            for (let i = 0; i < 20; i++) {
+                const r = await app.inject({ method: 'GET', url: '/api/exercises' });
+                if (r.statusCode === 429) {
+                    body = r.body;
+                    break;
+                }
             }
+            expect(body).toContain('RATE_LIMITED');
+            expect(JSON.parse(body)).toMatchObject({ error: { code: 'RATE_LIMITED' } });
+        } finally {
+            delete process.env.RATE_LIMIT_MAX;
+            await app?.close();
         }
-        expect(body).toContain('RATE_LIMITED');
-        expect(JSON.parse(body)).toMatchObject({ error: { code: 'RATE_LIMITED' } });
-        await app.close();
     });
 
     it('inputMode=keyboard → 422 KEYBOARD_NOT_ALLOWED (10-§1 pointeur-seul)', async () => {

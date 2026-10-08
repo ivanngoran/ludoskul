@@ -86,7 +86,9 @@ model OtpChallenge {
   purpose          String
   channel          String
   targetHash       String
+  targetEncrypted  String?
   codeHash         String
+  tokenHash        String?   @unique
   expiresAt        DateTime
   attempts         Int       @default(0)
   resendAvailableAt DateTime
@@ -242,11 +244,14 @@ model UserBadge {
 model AuthRefresh {
   id        String    @id @default(cuid())
   userId    String
+  deviceId  String?
   tokenHash String    @unique
   expiresAt DateTime
   revokedAt DateTime?
   createdAt DateTime  @default(now())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([deviceId])
 }
 
 model DeletedPseudo {
