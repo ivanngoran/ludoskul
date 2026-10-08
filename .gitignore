@@ -13,3 +13,10 @@ playwright-report/
 test-results/
 postgres-data/
 redis-data/
+# Artefacts TS colocatés (tsc hors dist) — sources .ts font foi
+*.js.map
+*.d.ts.map
+apps/api/prisma/seed.js
+apps/api/prisma/seed.d.ts
+packages/shared/dist/
+apps/api/dist/

@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSP front opposable 10-§2 (même politique que l'API, connect-src ajusté au backend). -->
+    <meta
+        http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; connect-src 'self' https://api.ludoskul.app wss://api.ludoskul.app; img-src 'self' data:; media-src 'self'; frame-ancestors 'none'; base-uri 'self'"
+    />
     <title>Ludoskul — Maths ludiques</title>
 </head>
 

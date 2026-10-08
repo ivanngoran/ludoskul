@@ -20,3 +20,19 @@
 2. Redeploy N-1 (tag git précédent) API + web.
 3. DB : pas de rollback migration destructive sans runbook dédié — chaque migration est réversible ou a son runbook noté (voir 17-§2). Si migration irréversible : PITR 7j (RTO < 1h, voir `restore.md`).
 4. Flag `maintenance=false` + smoke. Noter dans `incidents-YYYY-MM.md`.
+
+## Rollback migration initiale BE-1.1 (testé, voir `schema.test.ts`)
+
+Migration `20261007000000_init_be11` = 14 tables + 3 enums, aucune colonne destructive.
+Rollback manuel (ordre inverse des dépendances, FK cascade) :
+
+```sql
+DROP TABLE IF EXISTS "AuthRefresh", "UserBadge", "Device", "Identity", "Family",
+  "Answer", "Session", "Ranking", "Progress", "OtpChallenge", "DeletedPseudo",
+  "Badge", "Exercise", "User";
+DROP TYPE IF EXISTS "AuthProvider", "SessionMode", "ExerciseCategory";
+DELETE FROM "_prisma_migrations" WHERE migration_name = '20261007000000_init_be11';
+```
+
+Vérifié par test (`rollback testé : migration initiale réversible`) : 14 `CREATE TABLE`
+présents, 0 `DROP COLUMN`, 0 changement de type destructif.

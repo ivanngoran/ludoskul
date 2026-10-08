@@ -1,6 +1,6 @@
 # @ludoskul/api — Run local (BE-1.2 / BE-1.4)
 
-Socle fondations BE-EPIC-01 : Fastify 4 + Prisma 5 + PostgreSQL 16.
+Socle fondations BE-EPIC-01 : Fastify 5 + Prisma 5 + PostgreSQL 16.
 
 ## Prérequis
 
@@ -64,6 +64,9 @@ pnpm openapi:gen
 pnpm openapi:check
 pnpm audit --audit-level=high
 ```
+
+> Test cascade RGPD (`cascade.test.ts`, DoD BE-1.1) : skippé en local sans `DATABASE_URL`,
+> obligatoire en CI (service Postgres, échec si DB absente).
 
 CI `.github/workflows/ci.yml` : `prisma validate` + `db:seed:check` + `lint` + `typecheck` + `test` + `build` + `openapi:gen/check` + `audit high`.
 

@@ -28,7 +28,7 @@
       Acceptation : PR bloquée si test rouge ou vulnérabilité high+.
       DoD : badge CI vert + `/api/docs` à jour.
       Réalisé 2026-10-08 : CI avec Postgres 16 de service (`migrate deploy` + `db:seed` + `db:seed:check`), `prisma validate`, `lint` + `typecheck` + `test` + `build`, `openapi:gen/check` vert, audit prod 0 high/critical (`pnpm audit --prod`). Audit global : 3 dev-only restantes (`tinypool` via vitest 3, `braces` via tailwind 3 — v1.1). Stack Fastify 5 (décision 13-L1).
-      Rework revue BE-EPIC-01 (2026-10-08, en cours) : fuite 500 FR, rate-limit /health, CORS fail-fast, schemas OpenAPI, lockfile, /ready 503, SBOM/dependabot, migrate-check drift.
+      Rework revue BE-EPIC-01 (2026-10-08) : 500 FR générique + log serveur (10-§2), `/health`+`/ready` hors rate-limit, 429 `RATE_LIMITED` FR, CORS fail-fast prod + `assertProdConfig`, schémas Zod sur 15 routes (0 `Default Response`), `openapi:check` codes+schémas, CI `frozen-lockfile` + `migrate diff --exit-code` + openapi figé, job SBOM mensuel + Dependabot, Dockerfiles `frozen-lockfile`, `/ready` 503 sans DB, cascade RGPD obligatoire en CI, rollback BE-1.1 testé + runbook, `seed-check` synchro shared/seeds + `requires` 6 pros (`POLYVALENT` complété), artefacts Prisma désuivisis + `.gitignore`, README Fastify 5, CSP front `index.html`, `keyboard` → 422 `KEYBOARD_NOT_ALLOWED` + `FST_ERR_VALIDATION` → `VALIDATION_ERROR`. Tests : 33 API + 10 shared verts, lint/typecheck/build/audit prod OK.
 
 ## BE-EPIC-2 — Auth multi-provider + mineurs + devices (08b)
 

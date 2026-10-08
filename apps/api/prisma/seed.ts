@@ -56,6 +56,9 @@ for (const e of exercises) {
 }
 
 for (const b of badges) {
+    // 08-§1 : le modèle Badge ne persiste pas `requires` (code,name,description,xpBonus,icon).
+    // `requires` reste servi par GET /api/badges depuis le référentiel JSON (07-§5, 17-§3)
+    // et sa présence est vérifiée par db:seed:check. Persistance en BE-6.2 si attribution serveur l'exige.
     await prisma.badge.upsert({
         where: { code: b.code },
         update: { name: b.name, description: b.description, xpBonus: b.xpBonus, icon: b.icon },

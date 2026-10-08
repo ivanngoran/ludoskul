@@ -4,6 +4,12 @@ import { PrismaClient } from '@prisma/client';
 const dbUrl = process.env.DATABASE_URL ?? '';
 const dbReady = dbUrl.length > 0;
 
+// DoD BE-1.1 : la cascade RGPD doit être prouvée au moins en CI (service Postgres).
+// En local sans DATABASE_URL le test est skippé ; en CI il est obligatoire.
+if (!dbReady && process.env.CI) {
+    throw new Error('DATABASE_URL requis en CI pour le test cascade RGPD (DoD BE-1.1)');
+}
+
 describe.runIf(dbReady)('BE-1.1 cascade delete RGPD (DB live)', () => {
     it('delete User → cascade tout sauf DeletedPseudo', async () => {
         const prisma = new PrismaClient();

@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,8 +36,9 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-      - run: pnpm install --frozen-lockfile=false
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @ludoskul/api exec prisma validate
+      - run: pnpm --filter @ludoskul/api exec prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url "$DATABASE_URL" --exit-code
       - run: pnpm --filter @ludoskul/api exec prisma migrate deploy
       - run: pnpm --filter @ludoskul/api db:seed
       - run: pnpm --filter @ludoskul/api db:seed:check
@@ -42,5 +46,29 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      - run: pnpm openapi:gen && pnpm openapi:check
+      - run: pnpm openapi:gen && git diff --exit-code -- apps/api/openapi.json && pnpm openapi:check
       - run: pnpm audit --prod --audit-level=high
+
+  sbom:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: anchore/sbom-action@v0
+        with:
+          path: ./
+          format: spdx-json
+          output-file: sbom.spdx.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-spdx
+          path: sbom.spdx.json
+          retention-days: 90

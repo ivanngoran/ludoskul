@@ -11,6 +11,7 @@ import {
     trainingSeed,
     type ExerciseCode,
 } from '@ludoskul/shared';
+import { openApiSchemas } from './schemas.js';
 
 interface StoredSession {
     id: string;
@@ -33,7 +34,7 @@ function newId(prefix: string): string {
 }
 
 export async function sessionRoutes(app: FastifyInstance): Promise<void> {
-    app.post('/api/sessions', async (req, reply) => {
+    app.post('/api/sessions', { schema: openApiSchemas.createSession }, async (req, reply) => {
         const parsed = createSessionSchema.safeParse(req.body);
         if (!parsed.success) {
             return reply.status(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Requête invalide' } });
@@ -64,9 +65,9 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         });
     });
 
-    app.get('/api/sessions/active', async () => ({ sessions: [...sessions.values()].slice(-5) }));
+    app.get('/api/sessions/active', { schema: openApiSchemas.activeSessions }, async () => ({ sessions: [...sessions.values()].slice(-5) }));
 
-    app.get('/api/sessions/:id/questions', async (req, reply) => {
+    app.get('/api/sessions/:id/questions', { schema: openApiSchemas.questions }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
@@ -91,7 +92,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         };
     });
 
-    app.post('/api/sessions/:id/training-level', async (req, reply) => {
+    app.post('/api/sessions/:id/training-level', { schema: openApiSchemas.trainingLevel }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
@@ -104,7 +105,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         return { level, blockIndex: 0, seed: trainingSeed(id, s.exerciseCode, level, 0) };
     });
 
-    app.post('/api/sessions/:id/answers', async (req, reply) => {
+    app.post('/api/sessions/:id/answers', { schema: openApiSchemas.answers }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
@@ -113,7 +114,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
             return reply.status(400).send({ error: { code: 'VALIDATION_ERROR', message: 'Réponse invalide' } });
         }
         const body = parsed.data;
-        if ((body.inputMode as string) === 'keyboard') {
+        if (body.inputMode === 'keyboard') {
             return reply.status(422).send({ error: { code: 'KEYBOARD_NOT_ALLOWED', message: 'Clavier non autorisé en jeu (MVP)' } });
         }
         const seed = s.mode === 'ARCADE'
@@ -152,7 +153,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         return { mode: s.mode, correct: false, trainingPoints: 0, streakLocal: 0, tip: `La réponse était ${expected.answer}` };
     });
 
-    app.post('/api/sessions/:id/complete', async (req, reply) => {
+    app.post('/api/sessions/:id/complete', { schema: openApiSchemas.complete }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
@@ -172,7 +173,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         };
     });
 
-    app.post('/api/sessions/:id/stop', async (req, reply) => {
+    app.post('/api/sessions/:id/stop', { schema: openApiSchemas.stop }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });
@@ -186,7 +187,7 @@ export async function sessionRoutes(app: FastifyInstance): Promise<void> {
         };
     });
 
-    app.post('/api/sessions/:id/abandon', async (req, reply) => {
+    app.post('/api/sessions/:id/abandon', { schema: openApiSchemas.abandon }, async (req, reply) => {
         const { id } = req.params as { id: string };
         const s = sessions.get(id);
         if (!s) return reply.status(404).send({ error: { code: 'NOT_FOUND', message: 'Session inconnue' } });

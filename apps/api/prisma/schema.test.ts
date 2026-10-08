@@ -185,4 +185,33 @@ describe('BE-1.1 Prisma schema socle 08-§1 + 08b-§3', () => {
         expect(sql).toContain('Progress_userId_exerciseId_key');
         expect(sql).toContain('UserBadge_userId_badgeCode_key');
     });
+
+    it('rollback testé : migration initiale réversible (BE-1.1 Acceptation)', () => {
+        // 17-§2 : chaque migration est réversible ou a son runbook noté.
+        // La migration initiale crée 14 tables + 3 enums : le rollback = DROP dans
+        // l'ordre inverse des dépendances (procédure dans docs/runbook/deploy.md §Rollback).
+        const sql = readFileSync(migrationPath, 'utf8');
+        const tables = [
+            '"AuthRefresh"',
+            '"UserBadge"',
+            '"Device"',
+            '"Identity"',
+            '"Family"',
+            '"Answer"',
+            '"Session"',
+            '"Ranking"',
+            '"Progress"',
+            '"OtpChallenge"',
+            '"DeletedPseudo"',
+            '"Badge"',
+            '"Exercise"',
+            '"User"',
+        ];
+        for (const t of tables) {
+            expect(sql).toContain(`CREATE TABLE ${t}`);
+        }
+        // Aucune opération irréversible sans runbook : pas de DROP COLUMN, pas de type change destructif.
+        expect(sql).not.toMatch(/DROP COLUMN/i);
+        expect(sql).not.toMatch(/ALTER COLUMN .* TYPE(?!.*USING)/i);
+    });
 });

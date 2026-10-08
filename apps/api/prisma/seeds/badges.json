@@ -100,7 +100,8 @@
     "name": "Polyvalent Maths",
     "description": "Finir les 26 exos 15/15",
     "xpBonus": 2000,
-    "icon": "trophy"
+    "icon": "trophy",
+    "requires": ["ADD", "SUB", "MUL", "DIV", "MIX", "TAB", "COMP10", "DOUBLE", "CMP", "FRAC", "DECI", "POURC", "TIME", "MES", "MONEY", "SHAPE_2D", "SHAPE_3D", "PROP", "SYM", "PERIM", "AREA", "ANGLE", "VOL", "REP", "SUITE", "PROB"]
   },
   {
     "code": "EARLY_BIRD",

@@ -12,7 +12,30 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Santé OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "at"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -21,7 +44,58 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Prêt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "db": {
+                      "type": "string"
+                    },
+                    "redis": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "db",
+                    "redis"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Pas prêt (DB non branchée)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "db": {
+                      "type": "string"
+                    },
+                    "redis": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "db",
+                    "redis"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -30,7 +104,95 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Catalogue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exercises": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "enum": [
+                              "ADD",
+                              "SUB",
+                              "MUL",
+                              "DIV",
+                              "MIX",
+                              "TAB",
+                              "CMP",
+                              "FRAC",
+                              "DECI",
+                              "POURC",
+                              "COMP10",
+                              "DOUBLE",
+                              "TIME",
+                              "MES",
+                              "MONEY",
+                              "SHAPE_2D",
+                              "SHAPE_3D",
+                              "PROP",
+                              "SYM",
+                              "PERIM",
+                              "AREA",
+                              "ANGLE",
+                              "VOL",
+                              "REP",
+                              "SUITE",
+                              "PROB"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "icon": {
+                            "type": "string"
+                          },
+                          "color": {
+                            "type": "string"
+                          },
+                          "order": {
+                            "type": "integer"
+                          },
+                          "bestScoreArcade": {
+                            "type": "integer"
+                          },
+                          "maxLevelArcade": {
+                            "type": "integer"
+                          },
+                          "trainingQuestions": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "name",
+                          "category",
+                          "icon",
+                          "color",
+                          "order",
+                          "bestScoreArcade",
+                          "maxLevelArcade",
+                          "trainingQuestions"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "exercises"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -49,7 +211,179 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Détail exercice",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "ADD",
+                        "SUB",
+                        "MUL",
+                        "DIV",
+                        "MIX",
+                        "TAB",
+                        "CMP",
+                        "FRAC",
+                        "DECI",
+                        "POURC",
+                        "COMP10",
+                        "DOUBLE",
+                        "TIME",
+                        "MES",
+                        "MONEY",
+                        "SHAPE_2D",
+                        "SHAPE_3D",
+                        "PROP",
+                        "SYM",
+                        "PERIM",
+                        "AREA",
+                        "ANGLE",
+                        "VOL",
+                        "REP",
+                        "SUITE",
+                        "PROB"
+                      ]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "levels": {
+                      "type": "number",
+                      "enum": [
+                        15
+                      ]
+                    },
+                    "questionsPerLevel": {
+                      "type": "number",
+                      "enum": [
+                        3
+                      ]
+                    },
+                    "modes": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "TRAINING"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "enum": [
+                            "ARCADE"
+                          ]
+                        }
+                      ]
+                    },
+                    "timeLimits": {
+                      "type": "object",
+                      "properties": {
+                        "1-3": {
+                          "type": "number",
+                          "enum": [
+                            10
+                          ]
+                        },
+                        "4-6": {
+                          "type": "number",
+                          "enum": [
+                            8
+                          ]
+                        },
+                        "7-10": {
+                          "type": "number",
+                          "enum": [
+                            6
+                          ]
+                        },
+                        "11-15": {
+                          "type": "number",
+                          "enum": [
+                            5
+                          ]
+                        },
+                        "training": {
+                          "type": "string",
+                          "enum": [
+                            "indicatif"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "1-3",
+                        "4-6",
+                        "7-10",
+                        "11-15",
+                        "training"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "timeLimitForLevel": {
+                      "type": "integer"
+                    },
+                    "help": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "name",
+                    "description",
+                    "levels",
+                    "questionsPerLevel",
+                    "modes",
+                    "timeLimits",
+                    "timeLimitForLevel",
+                    "help"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -68,7 +402,30 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Manifeste TTS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "audioSrc": {
+                      "type": "string"
+                    },
+                    "fallbackTTS": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  },
+                  "required": [
+                    "audioSrc",
+                    "fallbackTTS"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -77,16 +434,276 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Badges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "badges": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "xpBonus": {
+                            "type": "integer"
+                          },
+                          "icon": {
+                            "type": "string"
+                          },
+                          "requires": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "earned": {
+                            "type": "boolean",
+                            "enum": [
+                              false
+                            ]
+                          },
+                          "earnedAt": {
+                            "enum": [
+                              "null"
+                            ],
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "name",
+                          "description",
+                          "xpBonus",
+                          "icon",
+                          "earned",
+                          "earnedAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "badges"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/sessions": {
       "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "exerciseCode": {
+                    "type": "string",
+                    "enum": [
+                      "ADD",
+                      "SUB",
+                      "MUL",
+                      "DIV",
+                      "MIX",
+                      "TAB",
+                      "CMP",
+                      "FRAC",
+                      "DECI",
+                      "POURC",
+                      "COMP10",
+                      "DOUBLE",
+                      "TIME",
+                      "MES",
+                      "MONEY",
+                      "SHAPE_2D",
+                      "SHAPE_3D",
+                      "PROP",
+                      "SYM",
+                      "PERIM",
+                      "AREA",
+                      "ANGLE",
+                      "VOL",
+                      "REP",
+                      "SUITE",
+                      "PROB"
+                    ]
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "TRAINING",
+                      "ARCADE"
+                    ]
+                  },
+                  "level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 15
+                  }
+                },
+                "required": [
+                  "exerciseCode",
+                  "mode"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
         "responses": {
-          "200": {
-            "description": "Default Response"
+          "201": {
+            "description": "Session créée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "TRAINING",
+                        "ARCADE"
+                      ]
+                    },
+                    "exerciseCode": {
+                      "type": "string",
+                      "enum": [
+                        "ADD",
+                        "SUB",
+                        "MUL",
+                        "DIV",
+                        "MIX",
+                        "TAB",
+                        "CMP",
+                        "FRAC",
+                        "DECI",
+                        "POURC",
+                        "COMP10",
+                        "DOUBLE",
+                        "TIME",
+                        "MES",
+                        "MONEY",
+                        "SHAPE_2D",
+                        "SHAPE_3D",
+                        "PROP",
+                        "SYM",
+                        "PERIM",
+                        "AREA",
+                        "ANGLE",
+                        "VOL",
+                        "REP",
+                        "SUITE",
+                        "PROB"
+                      ]
+                    },
+                    "seedBase": {
+                      "type": "string"
+                    },
+                    "startLevel": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 15
+                    },
+                    "serverTime": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "sessionId",
+                    "mode",
+                    "exerciseCode",
+                    "seedBase",
+                    "startLevel",
+                    "serverTime"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Erreur 429",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -95,7 +712,107 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Sessions actives",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "exerciseCode": {
+                            "type": "string",
+                            "enum": [
+                              "ADD",
+                              "SUB",
+                              "MUL",
+                              "DIV",
+                              "MIX",
+                              "TAB",
+                              "CMP",
+                              "FRAC",
+                              "DECI",
+                              "POURC",
+                              "COMP10",
+                              "DOUBLE",
+                              "TIME",
+                              "MES",
+                              "MONEY",
+                              "SHAPE_2D",
+                              "SHAPE_3D",
+                              "PROP",
+                              "SYM",
+                              "PERIM",
+                              "AREA",
+                              "ANGLE",
+                              "VOL",
+                              "REP",
+                              "SUITE",
+                              "PROB"
+                            ]
+                          },
+                          "mode": {
+                            "type": "string",
+                            "enum": [
+                              "TRAINING",
+                              "ARCADE"
+                            ]
+                          },
+                          "level": {
+                            "type": "integer"
+                          },
+                          "blockIndex": {
+                            "type": "integer"
+                          },
+                          "seedBase": {
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": "integer"
+                          },
+                          "streak": {
+                            "type": "integer"
+                          },
+                          "lives": {
+                            "type": "integer"
+                          },
+                          "correct": {
+                            "type": "integer"
+                          },
+                          "total": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "exerciseCode",
+                          "mode",
+                          "level",
+                          "blockIndex",
+                          "seedBase",
+                          "score",
+                          "streak",
+                          "lives",
+                          "correct",
+                          "total"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "sessions"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -114,13 +831,153 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Questions sans réponses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "TRAINING",
+                        "ARCADE"
+                      ]
+                    },
+                    "level": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 15
+                    },
+                    "blockIndex": {
+                      "type": "integer"
+                    },
+                    "timeLimit": {
+                      "type": "integer"
+                    },
+                    "indicative": {
+                      "type": "boolean"
+                    },
+                    "seed": {
+                      "type": "string"
+                    },
+                    "lives": {
+                      "type": "integer"
+                    },
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "integer"
+                          },
+                          "hash": {
+                            "type": "string"
+                          },
+                          "prompt": {
+                            "type": "string"
+                          },
+                          "options": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "minItems": 4,
+                            "maxItems": 4
+                          },
+                          "asset": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "index",
+                          "hash",
+                          "prompt",
+                          "options",
+                          "asset"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "level",
+                    "blockIndex",
+                    "timeLimit",
+                    "indicative",
+                    "seed",
+                    "lives",
+                    "questions"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/sessions/{id}/training-level": {
       "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 15
+                  }
+                },
+                "required": [
+                  "level"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
         "parameters": [
           {
             "schema": {
@@ -133,13 +990,163 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Niveau training",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "level": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 15
+                    },
+                    "blockIndex": {
+                      "type": "number",
+                      "enum": [
+                        0
+                      ]
+                    },
+                    "seed": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "level",
+                    "blockIndex",
+                    "seed"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/sessions/{id}/answers": {
       "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "level": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 15
+                  },
+                  "blockIndex": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "index": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2
+                  },
+                  "questionHash": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "chosen": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "timeMs": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "inputMode": {
+                    "type": "string",
+                    "enum": [
+                      "mouse",
+                      "touch",
+                      "keyboard"
+                    ]
+                  }
+                },
+                "required": [
+                  "level",
+                  "index",
+                  "questionHash",
+                  "chosen",
+                  "timeMs",
+                  "inputMode"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
         "parameters": [
           {
             "schema": {
@@ -152,13 +1159,236 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Réponse validée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "type": "string",
+                          "enum": [
+                            "ARCADE"
+                          ]
+                        },
+                        "correct": {
+                          "type": "boolean"
+                        },
+                        "points": {
+                          "type": "integer"
+                        },
+                        "streak": {
+                          "type": "integer"
+                        },
+                        "lives": {
+                          "type": "integer"
+                        },
+                        "score": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "mode",
+                        "correct",
+                        "points",
+                        "streak",
+                        "lives",
+                        "score"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "type": "string",
+                          "enum": [
+                            "TRAINING"
+                          ]
+                        },
+                        "correct": {
+                          "type": "boolean"
+                        },
+                        "trainingPoints": {
+                          "type": "integer"
+                        },
+                        "streakLocal": {
+                          "type": "integer"
+                        },
+                        "tip": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "mode",
+                        "correct",
+                        "trainingPoints",
+                        "streakLocal",
+                        "tip"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Erreur 422",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Erreur 429",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/sessions/{id}/complete": {
       "post": {
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "assisted": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
         "parameters": [
           {
             "schema": {
@@ -171,7 +1401,126 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Session arcade terminée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "ARCADE"
+                      ]
+                    },
+                    "score": {
+                      "type": "integer"
+                    },
+                    "correct": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "accuracy": {
+                      "type": "number"
+                    },
+                    "xpGained": {
+                      "type": "integer"
+                    },
+                    "badges": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "ranking": {
+                      "enum": [
+                        "null"
+                      ],
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "score",
+                    "correct",
+                    "total",
+                    "accuracy",
+                    "xpGained",
+                    "badges",
+                    "ranking"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur 400",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -190,7 +1539,82 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Session training arrêtée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "TRAINING"
+                      ]
+                    },
+                    "questions": {
+                      "type": "integer"
+                    },
+                    "accuracy": {
+                      "type": "number"
+                    },
+                    "trainingScore": {
+                      "type": "integer"
+                    },
+                    "xpGained": {
+                      "type": "integer"
+                    },
+                    "badges": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "questions",
+                    "accuracy",
+                    "trainingScore",
+                    "xpGained",
+                    "badges"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -209,7 +1633,73 @@
         ],
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Session abandonnée",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "TRAINING",
+                        "ARCADE"
+                      ]
+                    },
+                    "maxLevel": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 15
+                    },
+                    "saved": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "maxLevel",
+                    "saved"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Erreur 404",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {}
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }
@@ -218,7 +1708,91 @@
       "get": {
         "responses": {
           "200": {
-            "description": "Default Response"
+            "description": "Flags publics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pilote6": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "providers": {
+                      "type": "object",
+                      "properties": {
+                        "google": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        },
+                        "apple": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        },
+                        "email": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        },
+                        "phone": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        },
+                        "guest": {
+                          "type": "boolean",
+                          "enum": [
+                            true
+                          ]
+                        }
+                      },
+                      "required": [
+                        "google",
+                        "apple",
+                        "email",
+                        "phone",
+                        "guest"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "tts": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "ranking": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "maintenance": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    }
+                  },
+                  "required": [
+                    "pilote6",
+                    "providers",
+                    "tts",
+                    "ranking",
+                    "maintenance"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
           }
         }
       }

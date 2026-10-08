@@ -8,8 +8,14 @@ function required(name: string, fallback = ''): string {
     return process.env[name] ?? fallback;
 }
 
-function parseOrigins(): string[] {
-    const raw = required('CORS_ORIGIN', required('FRONT_URL', 'http://localhost:5173'));
+function parseOrigins(env: NodeJS.ProcessEnv = process.env): string[] {
+    const raw = env.CORS_ORIGIN ?? env.FRONT_URL ?? '';
+    if (!raw.trim()) {
+        if (env.NODE_ENV === 'production') {
+            throw new Error('CORS_ORIGIN ou FRONT_URL requis en production (10-§2 : CORS = origine front seule)');
+        }
+        return ['http://localhost:5173'];
+    }
     return raw
         .split(',')
         .map((s) => s.trim())
@@ -27,8 +33,22 @@ export const config = {
     frontUrl: required('FRONT_URL', 'http://localhost:5173'),
 };
 
-export function isJwtConfigured(): boolean {
-    return config.jwtSecret.length >= 32 && config.jwtRefreshSecret.length >= 32;
+export function isJwtConfigured(env: NodeJS.ProcessEnv = process.env): boolean {
+    const jwt = env.JWT_SECRET ?? '';
+    const refresh = env.JWT_REFRESH_SECRET ?? '';
+    return jwt.length >= 32 && refresh.length >= 32;
+}
+
+/** Fail-fast prod (10-§2, 19-§2) : secrets et origine front requis au boot. */
+export function assertProdConfig(env: NodeJS.ProcessEnv = process.env): void {
+    if (env.NODE_ENV !== 'production') return;
+    const origins = parseOrigins(env);
+    if (origins.length === 0) {
+        throw new Error('CORS_ORIGIN ou FRONT_URL requis en production (10-§2)');
+    }
+    if (!isJwtConfigured(env)) {
+        throw new Error('JWT_SECRET et JWT_REFRESH_SECRET ≥32 requis en production (08b-§4)');
+    }
 }
 
 /** CSP stricte opposable 10-§2 (domaine ajusté au figement 22-§1). */
