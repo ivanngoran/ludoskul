@@ -23,11 +23,12 @@
       Acceptation : `GET exercises` retourne 6 actifs + `?includeInactive` 26 ; badges listés 39.
       DoD : script `db:seed` idempotent + test.
 
-- [x] **BE-1.4 CI + OpenAPI + qualité socle**
+- [-] **BE-1.4 CI + OpenAPI + qualité socle**
       Faire : GitHub Actions (lint, typecheck, test, migrate-check, audit 0 high/critical), OpenAPI généré depuis Zod, SBOM mensuel.
       Acceptation : PR bloquée si test rouge ou vulnérabilité high+.
       DoD : badge CI vert + `/api/docs` à jour.
       Réalisé 2026-10-08 : CI avec Postgres 16 de service (`migrate deploy` + `db:seed` + `db:seed:check`), `prisma validate`, `lint` + `typecheck` + `test` + `build`, `openapi:gen/check` vert, audit prod 0 high/critical (`pnpm audit --prod`). Audit global : 3 dev-only restantes (`tinypool` via vitest 3, `braces` via tailwind 3 — v1.1). Stack Fastify 5 (décision 13-L1).
+      Rework revue BE-EPIC-01 (2026-10-08, en cours) : fuite 500 FR, rate-limit /health, CORS fail-fast, schemas OpenAPI, lockfile, /ready 503, SBOM/dependabot, migrate-check drift.
 
 ## BE-EPIC-2 — Auth multi-provider + mineurs + devices (08b)
 
