@@ -37,6 +37,8 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ludoskul/shared build
+      - run: pnpm --filter @ludoskul/api exec prisma generate
       - run: pnpm --filter @ludoskul/api exec prisma validate
       - run: pnpm --filter @ludoskul/api exec prisma migrate diff --from-migrations ./prisma/migrations --to-schema-datamodel ./prisma/schema.prisma --shadow-database-url "$DATABASE_URL" --exit-code
       - run: pnpm --filter @ludoskul/api exec prisma migrate deploy

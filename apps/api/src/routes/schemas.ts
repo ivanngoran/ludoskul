@@ -72,7 +72,7 @@ export const openApiSchemas: Record<string, FastifySchema> = {
     questions: {
         response: {
             200: { description: 'Questions sans réponses', content: { 'application/json': { schema: json(questionsResponseSchema) } } },
-            ...err(404),
+            ...err(400, 404),
         },
     },
     trainingLevel: {
@@ -86,20 +86,20 @@ export const openApiSchemas: Record<string, FastifySchema> = {
         body: json(answerSchema),
         response: {
             200: { description: 'Réponse validée', content: { 'application/json': { schema: json(answerResponseSchema) } } },
-            ...err(400, 404, 422, 429),
+            ...err(400, 404, 409, 422, 429),
         },
     },
     complete: {
         body: json(completeSessionSchema),
         response: {
             200: { description: 'Session arcade terminée', content: { 'application/json': { schema: json(completeResponseSchema) } } },
-            ...err(400, 404),
+            ...err(400, 404, 409),
         },
     },
     stop: {
         response: {
             200: { description: 'Session training arrêtée', content: { 'application/json': { schema: json(stopResponseSchema) } } },
-            ...err(404),
+            ...err(400, 404),
         },
     },
     abandon: {

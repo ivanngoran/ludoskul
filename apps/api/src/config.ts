@@ -51,12 +51,20 @@ export function assertProdConfig(env: NodeJS.ProcessEnv = process.env): void {
     }
 }
 
-/** CSP stricte opposable 10-§2 (domaine ajusté au figement 22-§1). */
-export function cspDirectives(): Record<string, string[]> {
+/** CSP stricte opposable 10-§2 (domaine ajusté au figement 22-§1).
+ * connect-src externalisé via API_URL/FRONT_URL (preview/staging) : jamais en dur seul. */
+export function cspDirectives(env: NodeJS.ProcessEnv = process.env): Record<string, string[]> {
+    const extra = new Set<string>();
+    for (const raw of [env.API_URL, env.FRONT_URL, env.CORS_ORIGIN]) {
+        for (const origin of (raw ?? '').split(',')) {
+            const o = origin.trim().replace(/\/$/, '');
+            if (o.startsWith('https://') || o.startsWith('wss://')) extra.add(o);
+        }
+    }
     return {
         'default-src': ["'self'"],
         'script-src': ["'self'"],
-        'connect-src': ["'self'", 'https://api.ludoskul.app', 'wss://api.ludoskul.app'],
+        'connect-src': ["'self'", 'https://api.ludoskul.app', 'wss://api.ludoskul.app', ...extra],
         'img-src': ["'self'", 'data:'],
         'media-src': ["'self'"],
         'frame-ancestors': ["'none'"],
