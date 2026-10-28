@@ -146,7 +146,7 @@ export const patchMeSchema = z
             .regex(/^[A-Z]{2}$/, 'Pays ISO2 requis')
             .optional(),
         theme: z.string().min(1).max(32).optional(),
-        accessibility: z.record(z.unknown()).optional(),
+        accessibility: z.record(z.string(), z.unknown()).optional(),
     })
     .refine((v) => Object.keys(v).length > 0, 'Aucun champ à mettre à jour');
 

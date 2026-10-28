@@ -23,12 +23,13 @@
       Acceptation : `GET exercises` retourne 6 actifs + `?includeInactive` 26 ; badges listés 39.
       DoD : script `db:seed` idempotent + test.
 
-- [-] **BE-1.4 CI + OpenAPI + qualité socle**
+- [x] **BE-1.4 CI + OpenAPI + qualité socle**
       Faire : GitHub Actions (lint, typecheck, test, migrate-check, audit 0 high/critical), OpenAPI généré depuis Zod, SBOM mensuel.
       Acceptation : PR bloquée si test rouge ou vulnérabilité high+.
       DoD : badge CI vert + `/api/docs` à jour.
       Réalisé 2026-10-08 : CI avec Postgres 16 de service (`migrate deploy` + `db:seed` + `db:seed:check`), `prisma validate`, `lint` + `typecheck` + `test` + `build`, `openapi:gen/check` vert, audit prod 0 high/critical (`pnpm audit --prod`). Audit global : 3 dev-only restantes (`tinypool` via vitest 3, `braces` via tailwind 3 — v1.1). Stack Fastify 5 (décision 13-L1).
       Rework revue BE-EPIC-01 (2026-10-08) : 500 FR générique + log serveur (10-§2), `/health`+`/ready` hors rate-limit, 429 `RATE_LIMITED` FR, CORS fail-fast prod + `assertProdConfig`, schémas Zod sur 15 routes (0 `Default Response`), `openapi:check` codes+schémas, CI `frozen-lockfile` + `migrate diff --exit-code` + openapi figé, job SBOM mensuel + Dependabot, Dockerfiles `frozen-lockfile`, `/ready` 503 sans DB, cascade RGPD obligatoire en CI, rollback BE-1.1 testé + runbook, `seed-check` synchro shared/seeds + `requires` 6 pros (`POLYVALENT` complété), artefacts Prisma désuivisis + `.gitignore`, README Fastify 5, CSP front `index.html`, `keyboard` → 422 `KEYBOARD_NOT_ALLOWED` + `FST_ERR_VALIDATION` → `VALIDATION_ERROR`. Tests : 33 API + 10 shared verts, lint/typecheck/build/audit prod OK.
+      Test BE-1.4 (2026-10-27) : migration `zod` 3.25 → 4.6.7 (CVE GHSA-mrhx-c7xc-m3w5 high, audit prod 0 high/critical), `zod-to-json-schema` supprimé au profit de `z.toJSONSchema` natif (`openapi:check` vert, `openapi.json` régénéré), `z.record` v4 (clé explicite) sur 2 schémas, `jsdom` ajouté en dev web (config `vitest.config.ts` l'exigeait), timeouts vitest API 5s → 30s (`buildApp` ~6,5s en local), `pnpm install` réparé (`vitest` manquant dans `ui`). Vérifié : lint + typecheck + test (33 API / 10 shared / 0 web) + build + `openapi:gen/check` + `db:seed:check` + audit prod verts.
 
 ## BE-EPIC-2 — Auth multi-provider + mineurs + devices (08b)
 

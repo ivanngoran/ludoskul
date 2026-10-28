@@ -159,16 +159,24 @@
                             "type": "string"
                           },
                           "order": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "bestScoreArcade": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "maxLevelArcade": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "trainingQuestions": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
@@ -268,22 +276,24 @@
                     },
                     "modes": {
                       "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "TRAINING"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "ARCADE"
+                            ]
+                          }
+                        ]
+                      },
                       "minItems": 2,
-                      "maxItems": 2,
-                      "items": [
-                        {
-                          "type": "string",
-                          "enum": [
-                            "TRAINING"
-                          ]
-                        },
-                        {
-                          "type": "string",
-                          "enum": [
-                            "ARCADE"
-                          ]
-                        }
-                      ]
+                      "maxItems": 2
                     },
                     "timeLimits": {
                       "type": "object",
@@ -329,7 +339,9 @@
                       "additionalProperties": false
                     },
                     "timeLimitForLevel": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "help": {
                       "type": "object",
@@ -455,7 +467,9 @@
                             "type": "string"
                           },
                           "xpBonus": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "icon": {
                             "type": "string"
@@ -473,10 +487,11 @@
                             ]
                           },
                           "earnedAt": {
+                            "type": "string",
+                            "nullable": true,
                             "enum": [
-                              "null"
-                            ],
-                            "nullable": true
+                              null
+                            ]
                           }
                         },
                         "required": [
@@ -765,28 +780,42 @@
                             ]
                           },
                           "level": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "blockIndex": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "seedBase": {
                             "type": "string"
                           },
                           "score": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "streak": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "lives": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "correct": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "total": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           }
                         },
                         "required": [
@@ -850,10 +879,14 @@
                       "maximum": 15
                     },
                     "blockIndex": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "timeLimit": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "indicative": {
                       "type": "boolean"
@@ -862,15 +895,21 @@
                       "type": "string"
                     },
                     "lives": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "questions": {
+                      "minItems": 3,
+                      "maxItems": 3,
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "index": {
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
                           },
                           "hash": {
                             "type": "string"
@@ -879,16 +918,16 @@
                             "type": "string"
                           },
                           "options": {
+                            "minItems": 4,
+                            "maxItems": 4,
                             "type": "array",
                             "items": {
                               "type": "string"
-                            },
-                            "minItems": 4,
-                            "maxItems": 4
+                            }
                           },
                           "asset": {
-                            "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "type": "string"
                           }
                         },
                         "required": [
@@ -899,9 +938,7 @@
                           "asset"
                         ],
                         "additionalProperties": false
-                      },
-                      "minItems": 3,
-                      "maxItems": 3
+                      }
                     }
                   },
                   "required": [
@@ -1106,7 +1143,8 @@
                   },
                   "blockIndex": {
                     "type": "integer",
-                    "minimum": 0
+                    "minimum": 0,
+                    "maximum": 9007199254740991
                   },
                   "index": {
                     "type": "integer",
@@ -1123,7 +1161,8 @@
                   },
                   "timeMs": {
                     "type": "integer",
-                    "minimum": 0
+                    "minimum": 0,
+                    "maximum": 9007199254740991
                   },
                   "inputMode": {
                     "type": "string",
@@ -1177,16 +1216,24 @@
                           "type": "boolean"
                         },
                         "points": {
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
                         },
                         "streak": {
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
                         },
                         "lives": {
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
                         },
                         "score": {
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
                         }
                       },
                       "required": [
@@ -1212,10 +1259,14 @@
                           "type": "boolean"
                         },
                         "trainingPoints": {
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
                         },
                         "streakLocal": {
-                          "type": "integer"
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
                         },
                         "tip": {
                           "type": "string"
@@ -1380,10 +1431,13 @@
                 "type": "object",
                 "properties": {
                   "assisted": {
-                    "type": "boolean",
-                    "default": false
+                    "default": false,
+                    "type": "boolean"
                   }
                 },
+                "required": [
+                  "assisted"
+                ],
                 "additionalProperties": false
               }
             }
@@ -1414,19 +1468,27 @@
                       ]
                     },
                     "score": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "correct": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "total": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "accuracy": {
                       "type": "number"
                     },
                     "xpGained": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "badges": {
                       "type": "array",
@@ -1435,10 +1497,11 @@
                       }
                     },
                     "ranking": {
+                      "type": "string",
+                      "nullable": true,
                       "enum": [
-                        "null"
-                      ],
-                      "nullable": true
+                        null
+                      ]
                     }
                   },
                   "required": [
@@ -1552,16 +1615,22 @@
                       ]
                     },
                     "questions": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "accuracy": {
                       "type": "number"
                     },
                     "trainingScore": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "xpGained": {
-                      "type": "integer"
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
                     },
                     "badges": {
                       "type": "array",
@@ -1811,6 +1880,7 @@
                     "minLength": 1
                   },
                   "purpose": {
+                    "default": "login",
                     "type": "string",
                     "enum": [
                       "register",
@@ -1819,12 +1889,12 @@
                       "reset_password",
                       "delete_account",
                       "merge"
-                    ],
-                    "default": "login"
+                    ]
                   }
                 },
                 "required": [
-                  "email"
+                  "email",
+                  "purpose"
                 ],
                 "additionalProperties": false
               }
@@ -2340,7 +2410,8 @@
                 "properties": {
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   },
                   "pseudo": {
                     "type": "string",
@@ -2650,7 +2721,8 @@
                 "properties": {
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   }
                 },
                 "required": [
@@ -2784,7 +2856,8 @@
                 "properties": {
                   "email": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   },
                   "code": {
                     "type": "string",
@@ -3423,17 +3496,18 @@
                     "minLength": 1
                   },
                   "channel": {
+                    "default": "auto",
                     "type": "string",
                     "enum": [
                       "auto",
                       "whatsapp",
                       "sms"
-                    ],
-                    "default": "auto"
+                    ]
                   }
                 },
                 "required": [
-                  "phone"
+                  "phone",
+                  "channel"
                 ],
                 "additionalProperties": false
               }
@@ -3928,7 +4002,8 @@
                           },
                           "email": {
                             "type": "string",
-                            "format": "email"
+                            "format": "email",
+                            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                           },
                           "code": {
                             "type": "string",
@@ -3956,7 +4031,8 @@
                             "pattern": "^\\+[1-9]\\d{7,14}$"
                           },
                           "code": {
-                            "$ref": "#/properties/proof/anyOf/0/properties/code"
+                            "type": "string",
+                            "pattern": "^\\d{6}$"
                           }
                         },
                         "required": [
@@ -4186,20 +4262,20 @@
                             "type": "string"
                           },
                           "emailLower": {
-                            "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "type": "string"
                           },
                           "phoneMasked": {
-                            "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "type": "string"
                           },
                           "emailVerifiedAt": {
-                            "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "type": "string"
                           },
                           "phoneVerifiedAt": {
-                            "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "type": "string"
                           },
                           "lastUsedAt": {
                             "type": "string"
@@ -4748,8 +4824,8 @@
                           "type": "string"
                         },
                         "birthYear": {
-                          "type": "number",
-                          "nullable": true
+                          "nullable": true,
+                          "type": "number"
                         },
                         "xp": {
                           "type": "number"
@@ -4865,8 +4941,8 @@
                             "type": "string"
                           },
                           "birthYear": {
-                            "type": "number",
-                            "nullable": true
+                            "nullable": true,
+                            "type": "number"
                           },
                           "xp": {
                             "type": "number"
@@ -5268,8 +5344,8 @@
                           "type": "string"
                         },
                         "birthYear": {
-                          "type": "number",
-                          "nullable": true
+                          "nullable": true,
+                          "type": "number"
                         },
                         "xp": {
                           "type": "number"
@@ -5502,8 +5578,8 @@
                       "type": "string"
                     },
                     "email": {
-                      "type": "string",
-                      "nullable": true
+                      "nullable": true,
+                      "type": "string"
                     },
                     "pseudo": {
                       "type": "string"
@@ -5512,8 +5588,8 @@
                       "type": "string"
                     },
                     "country": {
-                      "type": "string",
-                      "nullable": true
+                      "nullable": true,
+                      "type": "string"
                     },
                     "xp": {
                       "type": "number"
@@ -5644,8 +5720,8 @@
                       "type": "string"
                     },
                     "country": {
-                      "type": "string",
-                      "nullable": true
+                      "nullable": true,
+                      "type": "string"
                     },
                     "theme": {
                       "type": "string"
@@ -5858,7 +5934,8 @@
                   },
                   "targetEmail": {
                     "type": "string",
-                    "format": "email"
+                    "format": "email",
+                    "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
                   },
                   "proof": {
                     "anyOf": [

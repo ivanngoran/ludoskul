@@ -81,7 +81,7 @@ export const exerciseDetailResponseSchema = z.object({
         training: z.literal('indicatif'),
     }),
     timeLimitForLevel: z.number().int(),
-    help: z.record(z.unknown()),
+    help: z.record(z.string(), z.unknown()),
 });
 
 export const exerciseTtsResponseSchema = z.object({

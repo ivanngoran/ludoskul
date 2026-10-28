@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifySchema } from 'fastify';
-import { zodToJsonSchema } from 'zod-to-json-schema';
-import type { ZodTypeAny } from 'zod';
+import { z } from 'zod';
 import {
     abandonResponseSchema,
     activeSessionsResponseSchema,
@@ -24,8 +23,8 @@ import {
     trainingLevelSchema,
 } from '@ludoskul/shared';
 
-function json(schema: ZodTypeAny): unknown {
-    return zodToJsonSchema(schema, { target: 'openApi3' });
+function json(schema: z.ZodType): unknown {
+    return z.toJSONSchema(schema, { target: 'openapi-3.0' });
 }
 
 function err(...codes: number[]): Record<string, unknown> {

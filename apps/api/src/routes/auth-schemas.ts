@@ -1,6 +1,5 @@
 import type { FastifySchema } from 'fastify';
-import { zodToJsonSchema } from 'zod-to-json-schema';
-import type { ZodTypeAny } from 'zod';
+import { z } from 'zod';
 import {
     authUserSchema,
     createChildSchema,
@@ -39,8 +38,8 @@ import {
     upgradeResultSchema,
 } from '@ludoskul/shared';
 
-function json(schema: ZodTypeAny): unknown {
-    return zodToJsonSchema(schema, { target: 'openApi3' });
+function json(schema: z.ZodType): unknown {
+    return z.toJSONSchema(schema, { target: 'openapi-3.0' });
 }
 
 function err(...codes: number[]): Record<string, unknown> {
@@ -49,7 +48,7 @@ function err(...codes: number[]): Record<string, unknown> {
     return out;
 }
 
-function ok(code: number, description: string, schema: ZodTypeAny, extraErr: number[] = []): Record<string, unknown> {
+function ok(code: number, description: string, schema: z.ZodType, extraErr: number[] = []): Record<string, unknown> {
     return {
         [String(code)]: { description, content: { 'application/json': { schema: json(schema) } } },
         ...err(...extraErr),
